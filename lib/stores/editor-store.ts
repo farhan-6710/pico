@@ -18,6 +18,14 @@ interface CanvasState {
   showGrid: boolean;
 }
 
+// Snapshot of undoable state
+interface EditorSnapshot {
+  layers: Layer[];
+  iconSettings: IconSettings;
+}
+
+const MAX_HISTORY = 50;
+
 interface EditorState {
   // Project info
   projectName: string;
@@ -34,9 +42,17 @@ interface EditorState {
   // Canvas state
   canvas: CanvasState;
 
+  // History for undo/redo
+  history: EditorSnapshot[];
+  historyIndex: number;
+
   // Actions - Project
   setProjectName: (name: string) => void;
   markSaved: () => void;
+
+  // Actions - Undo/Redo
+  undo: () => void;
+  redo: () => void;
 
   // Actions - Layers
   addLayer: (layer: Layer) => void;
@@ -79,6 +95,25 @@ const DEFAULT_CANVAS_STATE: CanvasState = {
 const generateId = () =>
   `layer-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
+// Helper to save snapshot for undo
+const saveSnapshot = (state: EditorState): void => {
+  const snapshot: EditorSnapshot = {
+    layers: JSON.parse(JSON.stringify(state.layers)),
+    iconSettings: JSON.parse(JSON.stringify(state.iconSettings)),
+  };
+
+  // Remove any future history if we're not at the end
+  state.history = state.history.slice(0, state.historyIndex + 1);
+  state.history.push(snapshot);
+
+  // Limit history size
+  if (state.history.length > MAX_HISTORY) {
+    state.history.shift();
+  } else {
+    state.historyIndex++;
+  }
+};
+
 export const useEditorStore = create<EditorState>()(
   immer((set) => ({
     // Initial state
@@ -91,6 +126,10 @@ export const useEditorStore = create<EditorState>()(
 
     iconSettings: DEFAULT_ICON_SETTINGS,
     canvas: DEFAULT_CANVAS_STATE,
+
+    // History
+    history: [{ layers: [], iconSettings: DEFAULT_ICON_SETTINGS }],
+    historyIndex: 0,
 
     // Project actions
     setProjectName: (name) =>
@@ -105,9 +144,37 @@ export const useEditorStore = create<EditorState>()(
         state.isDirty = false;
       }),
 
+    // Undo/Redo actions
+    undo: () =>
+      set((state) => {
+        if (state.historyIndex > 0) {
+          state.historyIndex--;
+          const snapshot = state.history[state.historyIndex];
+          state.layers = JSON.parse(JSON.stringify(snapshot.layers));
+          state.iconSettings = JSON.parse(
+            JSON.stringify(snapshot.iconSettings)
+          );
+          state.isDirty = true;
+        }
+      }),
+
+    redo: () =>
+      set((state) => {
+        if (state.historyIndex < state.history.length - 1) {
+          state.historyIndex++;
+          const snapshot = state.history[state.historyIndex];
+          state.layers = JSON.parse(JSON.stringify(snapshot.layers));
+          state.iconSettings = JSON.parse(
+            JSON.stringify(snapshot.iconSettings)
+          );
+          state.isDirty = true;
+        }
+      }),
+
     // Layer actions
     addLayer: (layer) =>
       set((state) => {
+        saveSnapshot(state);
         state.layers.unshift({ ...layer, id: layer.id || generateId() });
         state.selectedLayerId = layer.id;
         state.isDirty = true;
@@ -117,6 +184,7 @@ export const useEditorStore = create<EditorState>()(
       set((state) => {
         const index = state.layers.findIndex((l) => l.id === id);
         if (index !== -1) {
+          saveSnapshot(state);
           state.layers.splice(index, 1);
           if (state.selectedLayerId === id) {
             state.selectedLayerId = state.layers[0]?.id ?? null;
@@ -129,6 +197,7 @@ export const useEditorStore = create<EditorState>()(
       set((state) => {
         const layer = state.layers.find((l) => l.id === id);
         if (layer) {
+          saveSnapshot(state);
           Object.assign(layer, updates);
           state.isDirty = true;
         }
@@ -141,6 +210,7 @@ export const useEditorStore = create<EditorState>()(
 
     reorderLayers: (fromIndex, toIndex) =>
       set((state) => {
+        saveSnapshot(state);
         const [removed] = state.layers.splice(fromIndex, 1);
         state.layers.splice(toIndex, 0, removed);
         state.isDirty = true;
@@ -150,6 +220,7 @@ export const useEditorStore = create<EditorState>()(
       set((state) => {
         const layer = state.layers.find((l) => l.id === id);
         if (layer) {
+          saveSnapshot(state);
           const newLayer = {
             ...JSON.parse(JSON.stringify(layer)),
             id: generateId(),
@@ -166,6 +237,7 @@ export const useEditorStore = create<EditorState>()(
       set((state) => {
         const layer = state.layers.find((l) => l.id === id);
         if (layer) {
+          saveSnapshot(state);
           layer.visible = !layer.visible;
           state.isDirty = true;
         }
@@ -175,6 +247,7 @@ export const useEditorStore = create<EditorState>()(
       set((state) => {
         const layer = state.layers.find((l) => l.id === id);
         if (layer) {
+          saveSnapshot(state);
           layer.locked = !layer.locked;
           state.isDirty = true;
         }
@@ -183,12 +256,14 @@ export const useEditorStore = create<EditorState>()(
     // Icon settings actions
     setIconShape: (shape) =>
       set((state) => {
+        saveSnapshot(state);
         state.iconSettings.shape = shape;
         state.isDirty = true;
       }),
 
     setBackgroundColor: (color) =>
       set((state) => {
+        saveSnapshot(state);
         state.iconSettings.backgroundColor = color;
         state.isDirty = true;
       }),
@@ -239,3 +314,9 @@ export const useLayers = () => useEditorStore((state) => state.layers);
 export const useIconSettings = () =>
   useEditorStore((state) => state.iconSettings);
 export const useCanvasState = () => useEditorStore((state) => state.canvas);
+
+// Undo/Redo selectors
+export const useCanUndo = () =>
+  useEditorStore((state) => state.historyIndex > 0);
+export const useCanRedo = () =>
+  useEditorStore((state) => state.historyIndex < state.history.length - 1);

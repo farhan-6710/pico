@@ -15,7 +15,7 @@ import {
   useLayers,
   useSelectedLayer,
 } from "@/lib/stores/editor-store";
-import type { Layer, SVGLayer } from "@/types";
+import type { Layer, ImageLayer, TextLayer, ShapeLayer } from "@/types";
 import {
   Plus,
   Trash2,
@@ -38,12 +38,6 @@ import { cn } from "@/lib/utils";
 // Helper to generate unique IDs
 const generateId = () =>
   `layer-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-
-// Sample SVG icons for demo
-const SAMPLE_SVGS = {
-  coffee: `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>`,
-  steam: `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2c0 2-2 4-2 6s2 4 2 6"/><path d="M12 2c0 2-2 4-2 6s2 4 2 6"/><path d="M16 2c0 2-2 4-2 6s2 4 2 6"/></svg>`,
-};
 
 function LayerIcon({ type }: { type: Layer["type"] }) {
   const icons = {
@@ -219,90 +213,128 @@ export function LayersPanel() {
   const layers = useLayers();
   const selectedLayer = useSelectedLayer();
   const addLayer = useEditorStore((s) => s.addLayer);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleAddSVGLayer = () => {
-    const newLayer: SVGLayer = {
+  const handleAddImageLayer = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const src = e.target?.result as string;
+
+      // Create an image element to get natural dimensions
+      const img = new window.Image();
+      img.onload = () => {
+        const newLayer: ImageLayer = {
+          id: generateId(),
+          type: "image",
+          name: file.name.replace(/\.[^/.]+$/, ""),
+          visible: true,
+          locked: false,
+          opacity: 100,
+          blendMode: "normal",
+          position: { x: 0, y: 0 },
+          scale: 100,
+          rotation: 0,
+          src,
+          naturalWidth: img.naturalWidth,
+          naturalHeight: img.naturalHeight,
+        };
+        addLayer(newLayer);
+      };
+      img.src = src;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleAddImageLayer(file);
+    }
+    // Reset input so the same file can be selected again
+    e.target.value = "";
+  };
+
+  const handleAddTextLayer = () => {
+    const newLayer: TextLayer = {
       id: generateId(),
-      type: "svg",
-      name: `SVG Layer ${layers.length + 1}`,
+      type: "text",
+      name: `Text Layer ${layers.length + 1}`,
       visible: true,
       locked: false,
       opacity: 100,
       blendMode: "normal",
       position: { x: 0, y: 0 },
-      scale: 47,
+      scale: 100,
       rotation: 0,
-      svgContent: SAMPLE_SVGS.coffee,
+      text: "Hello World",
+      fontFamily: "Inter",
+      fontSize: 24,
+      fontWeight: 400,
+      color: "#ffffff",
+      textAlign: "center",
     };
     addLayer(newLayer);
   };
 
-  const handleAddSteamLayer = () => {
-    const newLayer: SVGLayer = {
+  const handleAddShapeLayer = () => {
+    const newLayer: ShapeLayer = {
       id: generateId(),
-      type: "svg",
-      name: `Steam Layer ${layers.length + 1}`,
+      type: "shape",
+      name: `Shape Layer ${layers.length + 1}`,
       visible: true,
       locked: false,
       opacity: 100,
       blendMode: "normal",
-      position: { x: 0, y: -60 },
-      scale: 80,
+      position: { x: 0, y: 0 },
+      scale: 100,
       rotation: 0,
-      svgContent: SAMPLE_SVGS.steam,
+      shapeType: "rectangle",
+      fill: "#ffffff",
+      cornerRadius: 8,
     };
     addLayer(newLayer);
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-border">
-        <h3 className="text-sm font-medium">Layers</h3>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1">
-              <Plus className="size-3" />
-              Add
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleAddSVGLayer}>
-              <FileCode className="size-4 mr-2" />
-              SVG Icon (Coffee)
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleAddSteamLayer}>
-              <FileCode className="size-4 mr-2" />
-              SVG Icon (Steam)
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <ImageIcon className="size-4 mr-2" aria-hidden />
-              Image Layer
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Type className="size-4 mr-2" />
-              Text Layer
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Square className="size-4 mr-2" />
-              Shape Layer
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+    <>
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileSelect}
+      />
 
       {/* Layers list */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+      <div className="overflow-y-auto p-4 space-y-1 h-full">
         {layers.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center p-4">
+          <div className="flex flex-col justify-center items-center h-full text-center">
             <div className="text-muted-foreground text-sm mb-2">
               No layers yet
             </div>
-            <Button variant="outline" size="sm" onClick={handleAddSVGLayer}>
-              <Plus className="size-3 mr-1" />
-              Add Layer
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-1">
+                  <Plus className="size-3" />
+                  Add Layer
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                  <ImageIcon className="size-4 mr-2" aria-hidden />
+                  Image
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleAddTextLayer}>
+                  <Type className="size-4 mr-2" />
+                  Text
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleAddShapeLayer}>
+                  <Square className="size-4 mr-2" />
+                  Shape
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         ) : (
           layers.map((layer) => (
@@ -314,6 +346,6 @@ export function LayersPanel() {
           ))
         )}
       </div>
-    </div>
+    </>
   );
 }

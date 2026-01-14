@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/popover";
 import { HexColorPicker } from "react-colorful";
 import { useEditorStore, useIconSettings } from "@/lib/stores/editor-store";
-import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Predefined color palettes
@@ -58,9 +57,12 @@ export function ColorsPanel() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-4">
+    <div className="flex flex-col gap-4 p-4">
       {/* Background Color Section */}
-      <section aria-labelledby="bg-color-heading">
+      <section
+        className="bg-background rounded-lg p-4"
+        aria-labelledby="bg-color-heading"
+      >
         <h3
           id="bg-color-heading"
           className="text-xs font-medium text-muted-foreground mb-3"
@@ -96,10 +98,14 @@ export function ColorsPanel() {
 
       {/* Color Palettes */}
       {Object.entries(COLOR_PALETTES).map(([paletteName, colors]) => (
-        <section key={paletteName} aria-labelledby={`${paletteName}-heading`}>
+        <section
+          key={paletteName}
+          className="bg-background rounded-lg p-4"
+          aria-labelledby={`${paletteName}-heading`}
+        >
           <h3
             id={`${paletteName}-heading`}
-            className="text-xs font-medium text-muted-foreground mb-2"
+            className="text-xs font-medium text-muted-foreground mb-3"
           >
             {paletteName}
           </h3>
@@ -121,14 +127,6 @@ export function ColorsPanel() {
           </div>
         </section>
       ))}
-
-      {/* Previews section header */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-xs font-medium text-muted-foreground">Previews</h3>
-        <Button variant="ghost" size="icon-sm" aria-label="Refresh previews">
-          <RefreshCw className="size-3" />
-        </Button>
-      </div>
     </div>
   );
 }

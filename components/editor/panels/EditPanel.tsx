@@ -3,7 +3,8 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -22,6 +23,7 @@ import {
   Blend,
   Minus,
   Plus,
+  Lock,
 } from "lucide-react";
 
 const BLEND_MODES: { value: BlendMode; label: string }[] = [
@@ -41,11 +43,12 @@ const BLEND_MODES: { value: BlendMode; label: string }[] = [
 
 export function EditPanel() {
   const selectedLayer = useSelectedLayer();
-  const updateLayer = useEditorStore((s) => s.updateLayer);
+  const { updateLayer, toggleLayerVisibility, toggleLayerLock } =
+    useEditorStore();
 
   if (!selectedLayer) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+      <div className="flex flex-col items-center justify-center flex-1 p-6 text-center">
         <div className="text-muted-foreground text-sm">
           Select a layer to edit its properties
         </div>
@@ -76,12 +79,15 @@ export function EditPanel() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-4">
-      {/* Transform Section */}
-      <section aria-labelledby="transform-heading">
+    <div className="flex flex-col gap-4 p-4">
+      {/* Transform Card */}
+      <section
+        className="bg-background rounded-lg border p-4"
+        aria-labelledby="transform-heading"
+      >
         <h3
           id="transform-heading"
-          className="text-xs font-medium text-muted-foreground mb-3"
+          className="text-xs font-medium text-muted-foreground mb-4"
         >
           Transform
         </h3>
@@ -95,84 +101,6 @@ export function EditPanel() {
             step={1}
             onChange={handleScaleChange}
           />
-
-          {/* Position controls */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <Move className="size-3" />
-                Position
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-muted-foreground">Y</span>
-                <span className="text-[10px] text-muted-foreground ml-6">
-                  X
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 flex-1">
-                <Button
-                  variant="outline"
-                  size="icon-sm"
-                  onClick={() =>
-                    handlePositionChange("y", selectedLayer.position.y - 1)
-                  }
-                  aria-label="Decrease Y position"
-                >
-                  <Minus className="size-3" />
-                </Button>
-                <Input
-                  type="number"
-                  value={selectedLayer.position.y}
-                  onChange={(e) =>
-                    handlePositionChange("y", parseInt(e.target.value) || 0)
-                  }
-                  className="h-7 w-12 text-xs text-center px-1"
-                />
-                <Button
-                  variant="outline"
-                  size="icon-sm"
-                  onClick={() =>
-                    handlePositionChange("y", selectedLayer.position.y + 1)
-                  }
-                  aria-label="Increase Y position"
-                >
-                  <Plus className="size-3" />
-                </Button>
-              </div>
-              <div className="flex items-center gap-1 flex-1">
-                <Button
-                  variant="outline"
-                  size="icon-sm"
-                  onClick={() =>
-                    handlePositionChange("x", selectedLayer.position.x - 1)
-                  }
-                  aria-label="Decrease X position"
-                >
-                  <Minus className="size-3" />
-                </Button>
-                <Input
-                  type="number"
-                  value={selectedLayer.position.x}
-                  onChange={(e) =>
-                    handlePositionChange("x", parseInt(e.target.value) || 0)
-                  }
-                  className="h-7 w-12 text-xs text-center px-1"
-                />
-                <Button
-                  variant="outline"
-                  size="icon-sm"
-                  onClick={() =>
-                    handlePositionChange("x", selectedLayer.position.x + 1)
-                  }
-                  aria-label="Increase X position"
-                >
-                  <Plus className="size-3" />
-                </Button>
-              </div>
-            </div>
-          </div>
 
           <SliderField
             label="Y Position"
@@ -204,13 +132,14 @@ export function EditPanel() {
         </div>
       </section>
 
-      <Separator />
-
-      {/* Appearance Section */}
-      <section aria-labelledby="appearance-heading">
+      {/* Appearance Card */}
+      <section
+        className="bg-background rounded-lg border p-4"
+        aria-labelledby="appearance-heading"
+      >
         <h3
           id="appearance-heading"
-          className="text-xs font-medium text-muted-foreground mb-3"
+          className="text-xs font-medium text-muted-foreground mb-4"
         >
           Appearance
         </h3>
@@ -249,10 +178,57 @@ export function EditPanel() {
         </div>
       </section>
 
-      <Separator />
+      {/* Default Card */}
+      <section
+        className="bg-background rounded-lg border p-4"
+        aria-labelledby="default-heading"
+      >
+        <h3
+          id="default-heading"
+          className="text-xs font-medium text-muted-foreground mb-4"
+        >
+          Default
+        </h3>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <Eye className="size-3" />
+              Visible
+            </Label>
+            <Switch
+              checked={selectedLayer.visible}
+              onCheckedChange={() => toggleLayerVisibility(selectedLayer.id)}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <Lock className="size-3" />
+              Locked
+            </Label>
+            <Switch
+              checked={selectedLayer.locked}
+              onCheckedChange={() => toggleLayerLock(selectedLayer.id)}
+            />
+          </div>
+        </div>
+      </section>
 
-      {/* Default indicator */}
-      <div className="text-xs text-muted-foreground">Default</div>
+      {/* Shadow Card */}
+      <section
+        className="bg-background rounded-lg border p-4"
+        aria-labelledby="shadow-heading"
+      >
+        <h3
+          id="shadow-heading"
+          className="text-xs font-medium text-muted-foreground mb-4"
+        >
+          Shadow
+        </h3>
+        <div className="flex items-center justify-between">
+          <Label className="text-xs text-muted-foreground">Shadow</Label>
+          <Switch checked={false} disabled />
+        </div>
+      </section>
     </div>
   );
 }

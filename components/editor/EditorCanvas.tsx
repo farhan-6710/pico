@@ -8,27 +8,47 @@ import {
   useCanvasState,
   useIconSettings,
   useLayers,
+  useCanUndo,
+  useCanRedo,
 } from "@/lib/stores/editor-store";
-import { Minus, Plus, RotateCcw, Grid3X3, Eye } from "lucide-react";
+import {
+  Minus,
+  Plus,
+  RotateCcw,
+  Grid3X3,
+  Eye,
+  Undo2,
+  Redo2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  CANVAS_SIZE,
+  CANVAS_GRID_LINES,
+  CANVAS_ZOOM_MIN,
+  CANVAS_ZOOM_MAX,
+  CANVAS_ZOOM_STEP,
+  CANVAS_ZOOM_SLIDER_MIN,
+  CANVAS_ZOOM_SLIDER_MAX,
+  CANVAS_ZOOM_SLIDER_STEP,
+  IOS_SQUIRCLE_RADIUS_RATIO,
+} from "@/lib/constants/canvas";
 
-// iOS-style squircle SVG clip path (continuous curvature)
-function IOSSquircleMask({ id }: { id: string }) {
+// Dotted background pattern for the workspace
+function DottedBackground() {
   return (
-    <svg width="0" height="0" className="absolute">
-      <defs>
-        <clipPath id={id} clipPathUnits="objectBoundingBox">
-          <path d="M 0.5 0 C 0.785 0 0.93 0.07 0.965 0.035 C 1 0.07 1 0.215 1 0.5 C 1 0.785 1 0.93 0.965 0.965 C 0.93 1 0.785 1 0.5 1 C 0.215 1 0.07 1 0.035 0.965 C 0 0.93 0 0.785 0 0.5 C 0 0.215 0 0.07 0.035 0.035 C 0.07 0 0.215 0 0.5 0" />
-        </clipPath>
-      </defs>
-    </svg>
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        backgroundImage: `radial-gradient(circle, var(--dotted-background) 1px, transparent 1px)`,
+        backgroundSize: "24px 24px",
+      }}
+    />
   );
 }
 
-// Grid overlay component
+// Grid overlay component for the icon
 function CanvasGrid({ size }: { size: number }) {
-  const gridLines = 8;
-  const cellSize = size / gridLines;
+  const cellSize = size / CANVAS_GRID_LINES;
 
   return (
     <svg
@@ -37,43 +57,47 @@ function CanvasGrid({ size }: { size: number }) {
       height={size}
       viewBox={`0 0 ${size} ${size}`}
     >
-      {/* Grid lines */}
-      {Array.from({ length: gridLines + 1 }, (_, i) => (
+      {/* Dotted grid lines */}
+      {Array.from({ length: CANVAS_GRID_LINES + 1 }, (_, i) => (
         <React.Fragment key={i}>
           <line
             x1={i * cellSize}
             y1={0}
             x2={i * cellSize}
             y2={size}
-            stroke="rgba(100, 200, 255, 0.3)"
-            strokeWidth={i === gridLines / 2 ? 1.5 : 0.5}
+            stroke="rgba(100, 200, 255, 0.4)"
+            strokeWidth={i === CANVAS_GRID_LINES / 2 ? 1 : 0.5}
+            strokeDasharray="4 4"
           />
           <line
             x1={0}
             y1={i * cellSize}
             x2={size}
             y2={i * cellSize}
-            stroke="rgba(100, 200, 255, 0.3)"
-            strokeWidth={i === gridLines / 2 ? 1.5 : 0.5}
+            stroke="rgba(100, 200, 255, 0.4)"
+            strokeWidth={i === CANVAS_GRID_LINES / 2 ? 1 : 0.5}
+            strokeDasharray="4 4"
           />
         </React.Fragment>
       ))}
-      {/* Diagonal guidelines */}
+      {/* Dotted diagonal guidelines */}
       <line
         x1={0}
         y1={0}
         x2={size}
         y2={size}
-        stroke="rgba(100, 200, 255, 0.2)"
+        stroke="rgba(100, 200, 255, 0.25)"
         strokeWidth={0.5}
+        strokeDasharray="4 4"
       />
       <line
         x1={size}
         y1={0}
         x2={0}
         y2={size}
-        stroke="rgba(100, 200, 255, 0.2)"
+        stroke="rgba(100, 200, 255, 0.25)"
         strokeWidth={0.5}
+        strokeDasharray="4 4"
       />
     </svg>
   );
@@ -140,25 +164,88 @@ export function EditorCanvas() {
   const iconSettings = useIconSettings();
   const canvas = useCanvasState();
   const layers = useLayers();
-  const { setZoom, resetView, toggleGrid } = useEditorStore();
+  const { setZoom, resetView, toggleGrid, undo, redo } = useEditorStore();
+  const canUndo = useCanUndo();
+  const canRedo = useCanRedo();
 
-  const canvasSize = 400; // Display size
-  const clipPathId = "ios-squircle-mask";
-
-  const handleZoomIn = () => setZoom(canvas.zoom + 0.1);
-  const handleZoomOut = () => setZoom(canvas.zoom - 0.1);
+  const handleZoomIn = () => setZoom(canvas.zoom + CANVAS_ZOOM_STEP);
+  const handleZoomOut = () => setZoom(canvas.zoom - CANVAS_ZOOM_STEP);
 
   const handleZoomSlider = (value: number[]) => {
     setZoom(value[0] / 100);
   };
 
+  // Keyboard shortcuts for undo/redo
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "z") {
+        e.preventDefault();
+        if (e.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [undo, redo]);
+
+  // Get the appropriate border radius for iOS squircle (continuous curvature approximation)
+  const getIconStyle = (): React.CSSProperties => {
+    const baseStyle: React.CSSProperties = {
+      width: CANVAS_SIZE,
+      height: CANVAS_SIZE,
+      backgroundColor: iconSettings.backgroundColor,
+    };
+
+    if (iconSettings.shape === "android-circle") {
+      return {
+        ...baseStyle,
+        borderRadius: "50%",
+      };
+    }
+
+    // iOS squircle - use smooth continuous curvature with high border radius
+    // The iOS icon corner radius is approximately 22.37% of the icon size
+    return {
+      ...baseStyle,
+      borderRadius: CANVAS_SIZE * IOS_SQUIRCLE_RADIUS_RATIO,
+    };
+  };
+
   return (
     <section
-      className="relative flex-1 flex items-center justify-center bg-background overflow-hidden"
+      className="relative flex-1 flex items-center justify-center bg-canvas overflow-hidden m-2 rounded-lg border border-muted"
       aria-label="Canvas workspace"
     >
-      {/* iOS Squircle mask definition */}
-      <IOSSquircleMask id={clipPathId} />
+      {/* Dotted background pattern */}
+      <DottedBackground />
+
+      {/* Undo/Redo controls - top left */}
+      <div className="absolute top-4 left-4 flex items-center gap-1 z-10">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={undo}
+          disabled={!canUndo}
+          aria-label="Undo (Cmd+Z)"
+          className="bg-card/80 backdrop-blur-sm"
+        >
+          <Undo2 className="size-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={redo}
+          disabled={!canRedo}
+          aria-label="Redo (Cmd+Shift+Z)"
+          className="bg-card/80 backdrop-blur-sm"
+        >
+          <Redo2 className="size-4" />
+        </Button>
+      </div>
 
       {/* Canvas viewport */}
       <div
@@ -167,23 +254,10 @@ export function EditorCanvas() {
           transform: `scale(${canvas.zoom}) translate(${canvas.pan.x}px, ${canvas.pan.y}px)`,
         }}
       >
-        {/* Icon background */}
+        {/* Icon container */}
         <div
-          className={cn(
-            "relative shadow-2xl",
-            iconSettings.shape === "android-circle" ? "rounded-full" : ""
-          )}
-          style={{
-            width: canvasSize,
-            height: canvasSize,
-            backgroundColor: iconSettings.backgroundColor,
-            clipPath:
-              iconSettings.shape === "ios-squircle"
-                ? `url(#${clipPathId})`
-                : undefined,
-            borderRadius:
-              iconSettings.shape === "android-circle" ? "50%" : undefined,
-          }}
+          className="relative shadow-2xl overflow-hidden"
+          style={getIconStyle()}
         >
           {/* Noise overlay */}
           {iconSettings.noise && (
@@ -196,6 +270,20 @@ export function EditorCanvas() {
             />
           )}
 
+          {/* Background grid pattern */}
+          <div
+            className="absolute inset-0 z-10 pointer-events-none"
+            style={{
+              backgroundImage: `url(/${
+                iconSettings.shape === "android-circle"
+                  ? "android-grid.png"
+                  : "ios-grid.png"
+              })`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+
           {/* Layers stack */}
           <div className="relative w-full h-full">
             {[...layers].reverse().map((layer) => (
@@ -204,12 +292,12 @@ export function EditorCanvas() {
           </div>
 
           {/* Grid overlay */}
-          {canvas.showGrid && <CanvasGrid size={canvasSize} />}
+          {canvas.showGrid && <CanvasGrid size={CANVAS_SIZE} />}
         </div>
       </div>
 
-      {/* Canvas controls */}
-      <div className="absolute top-4 right-4 flex items-center gap-2">
+      {/* Canvas controls - top right */}
+      <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
         <Button
           variant="outline"
           size="icon"
@@ -233,22 +321,22 @@ export function EditorCanvas() {
       </div>
 
       {/* Zoom controls */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-card/90 backdrop-blur-sm rounded-lg px-3 py-2 border border-border">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-card/90 backdrop-blur-sm rounded-lg px-3 py-2 border border-border z-10">
         <Button
           variant="ghost"
           size="icon-sm"
           onClick={handleZoomOut}
           aria-label="Zoom out"
-          disabled={canvas.zoom <= 0.1}
+          disabled={canvas.zoom <= CANVAS_ZOOM_MIN}
         >
           <Minus className="size-4" />
         </Button>
         <div className="w-32 flex items-center">
           <Slider
             value={[canvas.zoom * 100]}
-            min={10}
-            max={300}
-            step={5}
+            min={CANVAS_ZOOM_SLIDER_MIN}
+            max={CANVAS_ZOOM_SLIDER_MAX}
+            step={CANVAS_ZOOM_SLIDER_STEP}
             onValueChange={handleZoomSlider}
             aria-label="Zoom level"
           />
@@ -261,7 +349,7 @@ export function EditorCanvas() {
           size="icon-sm"
           onClick={handleZoomIn}
           aria-label="Zoom in"
-          disabled={canvas.zoom >= 3}
+          disabled={canvas.zoom >= CANVAS_ZOOM_MAX}
         >
           <Plus className="size-4" />
         </Button>

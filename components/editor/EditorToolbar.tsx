@@ -6,6 +6,7 @@ import { EditPanel } from "./panels/EditPanel";
 import { ColorsPanel } from "./panels/ColorsPanel";
 import { SurfacePanel } from "./panels/SurfacePanel";
 import { LayersPanel } from "./panels/LayersPanel";
+import { PreviewSection } from "./panels/PreviewSection";
 import { Pencil, Palette, MonitorSmartphone, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,36 +37,60 @@ export function EditorToolbar() {
         value={activeTab}
         onValueChange={(v) => setActiveTab(v as TabValue)}
         orientation="vertical"
-        className="flex h-full"
+        className="flex h-full gap-0"
       >
         {/* Panel content */}
-        <div className="flex-1 overflow-hidden">
-          <TabsContent value="edit" className="h-full m-0 overflow-y-auto">
-            <header className="p-4 border-b border-border">
+        <div className="flex-1 overflow-hidden flex flex-col">
+          <TabsContent
+            value="edit"
+            className="flex-1 m-0 flex flex-col overflow-hidden h-full"
+          >
+            <header className="p-4 border-b border-border shrink-0">
               <h2 className="text-base font-semibold">Edit Layer</h2>
             </header>
-            <EditPanel />
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <EditPanel />
+            </div>
+            <PreviewSection />
           </TabsContent>
 
-          <TabsContent value="colors" className="h-full m-0 overflow-y-auto">
-            <header className="p-4 border-b border-border">
+          <TabsContent
+            value="colors"
+            className="flex-1 m-0 flex flex-col overflow-hidden h-full"
+          >
+            <header className="p-4 border-b border-border shrink-0">
               <h2 className="text-base font-semibold">Edit Colors</h2>
             </header>
-            <ColorsPanel />
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <ColorsPanel />
+            </div>
+            <PreviewSection />
           </TabsContent>
 
-          <TabsContent value="surface" className="h-full m-0 overflow-y-auto">
-            <header className="p-4 border-b border-border">
+          <TabsContent
+            value="surface"
+            className="flex-1 m-0 flex flex-col overflow-hidden h-full"
+          >
+            <header className="p-4 border-b border-border shrink-0">
               <h2 className="text-base font-semibold">Edit Surface</h2>
             </header>
-            <SurfacePanel />
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <SurfacePanel />
+            </div>
+            <PreviewSection />
           </TabsContent>
 
           <TabsContent
             value="layers"
-            className="h-full m-0 overflow-hidden flex flex-col"
+            className="flex-1 m-0 flex flex-col overflow-hidden h-full"
           >
-            <LayersPanel />
+            <header className="p-4 border-b border-border shrink-0">
+              <h2 className="text-base font-semibold">Layers</h2>
+            </header>
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <LayersPanel />
+            </div>
+            <PreviewSection />
           </TabsContent>
         </div>
 

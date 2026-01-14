@@ -23,11 +23,11 @@ import {
   Archive,
   Settings,
 } from "lucide-react";
+import { ModeToggle } from "../shared/ModeToggle";
 
-function formatTimeAgo(date: Date | null): string {
+function formatTimeAgo(date: Date | null, now: Date): string {
   if (!date) return "Never saved";
 
-  const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffSecs = Math.floor(diffMs / 1000);
   const diffMins = Math.floor(diffSecs / 60);
@@ -44,6 +44,16 @@ export function EditorHeader() {
   const { projectName, lastSaved, markSaved } = useEditorStore();
   const [isEditing, setIsEditing] = React.useState(false);
   const [editedName, setEditedName] = React.useState(projectName);
+  const [currentTime, setCurrentTime] = React.useState<Date | null>(null);
+
+  // Only start tracking time on client to avoid hydration mismatch
+  React.useEffect(() => {
+    setCurrentTime(new Date());
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 10000); // Update every 10 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSave = () => {
     markSaved();
@@ -103,11 +113,14 @@ export function EditorHeader() {
       {/* Center section - save status */}
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <Check className="size-3.5 text-primary" />
-        <span>{formatTimeAgo(lastSaved)}</span>
+        <span suppressHydrationWarning>
+          {currentTime ? formatTimeAgo(lastSaved, currentTime) : "Saved"}
+        </span>
       </div>
 
       {/* Right section */}
       <div className="flex items-center gap-2">
+        <ModeToggle />
         <Button
           variant="ghost"
           size="sm"
