@@ -11,10 +11,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEditorStore, useIconSettings } from "@/lib/stores/editor-store";
+import {
+  useEditorStore,
+  useIconSettings,
+  useLayers,
+} from "@/lib/stores/editor-store";
 import type { IconShape } from "@/types";
 import { FileEdit, Square, Circle, FileImage, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { exportIcon } from "@/lib/utils/export";
 
 type ExportFormat = "png" | "jpg";
 type PresetType = "single" | "ios-pack" | "android-pack";
@@ -38,12 +43,14 @@ const EXPORT_SIZES: ExportSize[] = [
 export function ExportPanel() {
   const { setIconShape } = useEditorStore();
   const iconSettings = useIconSettings();
+  const layers = useLayers();
   const [fileName, setFileName] = React.useState("icon");
   const [format, setFormat] = React.useState<ExportFormat>("png");
   const [preset, setPreset] = React.useState<PresetType>("single");
   const [selectedSizes, setSelectedSizes] = React.useState<Set<number>>(
     new Set([1024])
   );
+  const [isExporting, setIsExporting] = React.useState(false);
 
   const handleSizeToggle = (size: number) => {
     const newSizes = new Set(selectedSizes);
@@ -59,15 +66,30 @@ export function ExportPanel() {
     setIconShape(value as IconShape);
   };
 
-  const handleExport = () => {
-    // TODO: Implement export functionality
-    console.log("Exporting:", {
-      fileName,
-      format,
-      iconSettings,
-      preset,
-      sizes: Array.from(selectedSizes),
-    });
+  const handleExport = async () => {
+    if (selectedSizes.size === 0) {
+      alert("Please select at least one size to export");
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      await exportIcon({
+        fileName,
+        format,
+        shapeType: iconSettings.shape,
+        backgroundColor: iconSettings.backgroundColor,
+        layers,
+        sizes: Array.from(selectedSizes).sort((a, b) => b - a),
+        noise: iconSettings.noise,
+        noiseOpacity: iconSettings.noiseOpacity,
+      });
+    } catch (error) {
+      console.error("Export failed:", error);
+      alert("Export failed. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -199,9 +221,10 @@ export function ExportPanel() {
         size="lg"
         className="w-full gap-2 bg-primary hover:bg-primary/90"
         onClick={handleExport}
+        disabled={isExporting || selectedSizes.size === 0}
       >
         <Download className="size-4" />
-        Export Image
+        {isExporting ? "Exporting..." : "Export Image"}
       </Button>
     </div>
   );
