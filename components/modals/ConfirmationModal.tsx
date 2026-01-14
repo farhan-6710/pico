@@ -52,7 +52,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       description={description}
     >
       <div className="flex flex-col gap-4">
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-4 p-2">
           {Icon && (
             <div className={`shrink-0 ${iconClassName}`}>
               <Icon className="h-5 w-5" />

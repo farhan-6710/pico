@@ -2,9 +2,10 @@
 
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
+import { persist, createJSONStorage } from "zustand/middleware";
 import type { Layer, IconShape } from "@/types";
 
-interface IconSettings {
+export interface IconSettings {
   shape: IconShape;
   backgroundColor: string;
   size: number;
@@ -115,193 +116,208 @@ const saveSnapshot = (state: EditorState): void => {
 };
 
 export const useEditorStore = create<EditorState>()(
-  immer((set) => ({
-    // Initial state
-    projectName: "splash-icon-lg...",
-    lastSaved: new Date(),
-    isDirty: false,
+  persist(
+    immer((set) => ({
+      // Initial state
+      projectName: "splash-icon-lg...",
+      lastSaved: new Date(),
+      isDirty: false,
 
-    layers: [],
-    selectedLayerId: null,
+      layers: [],
+      selectedLayerId: null,
 
-    iconSettings: DEFAULT_ICON_SETTINGS,
-    canvas: DEFAULT_CANVAS_STATE,
+      iconSettings: DEFAULT_ICON_SETTINGS,
+      canvas: DEFAULT_CANVAS_STATE,
 
-    // History
-    history: [{ layers: [], iconSettings: DEFAULT_ICON_SETTINGS }],
-    historyIndex: 0,
+      // History
+      history: [{ layers: [], iconSettings: DEFAULT_ICON_SETTINGS }],
+      historyIndex: 0,
 
-    // Project actions
-    setProjectName: (name) =>
-      set((state) => {
-        state.projectName = name;
-        state.isDirty = true;
-      }),
-
-    markSaved: () =>
-      set((state) => {
-        state.lastSaved = new Date();
-        state.isDirty = false;
-      }),
-
-    // Undo/Redo actions
-    undo: () =>
-      set((state) => {
-        if (state.historyIndex > 0) {
-          state.historyIndex--;
-          const snapshot = state.history[state.historyIndex];
-          state.layers = JSON.parse(JSON.stringify(snapshot.layers));
-          state.iconSettings = JSON.parse(
-            JSON.stringify(snapshot.iconSettings)
-          );
+      // Project actions
+      setProjectName: (name) =>
+        set((state) => {
+          state.projectName = name;
           state.isDirty = true;
-        }
-      }),
+        }),
 
-    redo: () =>
-      set((state) => {
-        if (state.historyIndex < state.history.length - 1) {
-          state.historyIndex++;
-          const snapshot = state.history[state.historyIndex];
-          state.layers = JSON.parse(JSON.stringify(snapshot.layers));
-          state.iconSettings = JSON.parse(
-            JSON.stringify(snapshot.iconSettings)
-          );
-          state.isDirty = true;
-        }
-      }),
+      markSaved: () =>
+        set((state) => {
+          state.lastSaved = new Date();
+          state.isDirty = false;
+        }),
 
-    // Layer actions
-    addLayer: (layer) =>
-      set((state) => {
-        saveSnapshot(state);
-        state.layers.unshift({ ...layer, id: layer.id || generateId() });
-        state.selectedLayerId = layer.id;
-        state.isDirty = true;
-      }),
-
-    removeLayer: (id) =>
-      set((state) => {
-        const index = state.layers.findIndex((l) => l.id === id);
-        if (index !== -1) {
-          saveSnapshot(state);
-          state.layers.splice(index, 1);
-          if (state.selectedLayerId === id) {
-            state.selectedLayerId = state.layers[0]?.id ?? null;
+      // Undo/Redo actions
+      undo: () =>
+        set((state) => {
+          if (state.historyIndex > 0) {
+            state.historyIndex--;
+            const snapshot = state.history[state.historyIndex];
+            state.layers = JSON.parse(JSON.stringify(snapshot.layers));
+            state.iconSettings = JSON.parse(
+              JSON.stringify(snapshot.iconSettings)
+            );
+            state.isDirty = true;
           }
-          state.isDirty = true;
-        }
-      }),
+        }),
 
-    updateLayer: (id, updates) =>
-      set((state) => {
-        const layer = state.layers.find((l) => l.id === id);
-        if (layer) {
+      redo: () =>
+        set((state) => {
+          if (state.historyIndex < state.history.length - 1) {
+            state.historyIndex++;
+            const snapshot = state.history[state.historyIndex];
+            state.layers = JSON.parse(JSON.stringify(snapshot.layers));
+            state.iconSettings = JSON.parse(
+              JSON.stringify(snapshot.iconSettings)
+            );
+            state.isDirty = true;
+          }
+        }),
+
+      // Layer actions
+      addLayer: (layer) =>
+        set((state) => {
           saveSnapshot(state);
-          Object.assign(layer, updates);
+          state.layers.unshift({ ...layer, id: layer.id || generateId() });
+          state.selectedLayerId = layer.id;
           state.isDirty = true;
-        }
-      }),
+        }),
 
-    selectLayer: (id) =>
-      set((state) => {
-        state.selectedLayerId = id;
-      }),
-
-    reorderLayers: (fromIndex, toIndex) =>
-      set((state) => {
-        saveSnapshot(state);
-        const [removed] = state.layers.splice(fromIndex, 1);
-        state.layers.splice(toIndex, 0, removed);
-        state.isDirty = true;
-      }),
-
-    duplicateLayer: (id) =>
-      set((state) => {
-        const layer = state.layers.find((l) => l.id === id);
-        if (layer) {
-          saveSnapshot(state);
-          const newLayer = {
-            ...JSON.parse(JSON.stringify(layer)),
-            id: generateId(),
-            name: `${layer.name} copy`,
-          };
+      removeLayer: (id) =>
+        set((state) => {
           const index = state.layers.findIndex((l) => l.id === id);
-          state.layers.splice(index, 0, newLayer);
-          state.selectedLayerId = newLayer.id;
-          state.isDirty = true;
-        }
-      }),
+          if (index !== -1) {
+            saveSnapshot(state);
+            state.layers.splice(index, 1);
+            if (state.selectedLayerId === id) {
+              state.selectedLayerId = state.layers[0]?.id ?? null;
+            }
+            state.isDirty = true;
+          }
+        }),
 
-    toggleLayerVisibility: (id) =>
-      set((state) => {
-        const layer = state.layers.find((l) => l.id === id);
-        if (layer) {
+      updateLayer: (id, updates) =>
+        set((state) => {
+          const layer = state.layers.find((l) => l.id === id);
+          if (layer) {
+            saveSnapshot(state);
+            Object.assign(layer, updates);
+            state.isDirty = true;
+          }
+        }),
+
+      selectLayer: (id) =>
+        set((state) => {
+          state.selectedLayerId = id;
+        }),
+
+      reorderLayers: (fromIndex, toIndex) =>
+        set((state) => {
           saveSnapshot(state);
-          layer.visible = !layer.visible;
+          const [removed] = state.layers.splice(fromIndex, 1);
+          state.layers.splice(toIndex, 0, removed);
           state.isDirty = true;
-        }
-      }),
+        }),
 
-    toggleLayerLock: (id) =>
-      set((state) => {
-        const layer = state.layers.find((l) => l.id === id);
-        if (layer) {
+      duplicateLayer: (id) =>
+        set((state) => {
+          const layer = state.layers.find((l) => l.id === id);
+          if (layer) {
+            saveSnapshot(state);
+            const newLayer = {
+              ...JSON.parse(JSON.stringify(layer)),
+              id: generateId(),
+              name: `${layer.name} copy`,
+            };
+            const index = state.layers.findIndex((l) => l.id === id);
+            state.layers.splice(index, 0, newLayer);
+            state.selectedLayerId = newLayer.id;
+            state.isDirty = true;
+          }
+        }),
+
+      toggleLayerVisibility: (id) =>
+        set((state) => {
+          const layer = state.layers.find((l) => l.id === id);
+          if (layer) {
+            saveSnapshot(state);
+            layer.visible = !layer.visible;
+            state.isDirty = true;
+          }
+        }),
+
+      toggleLayerLock: (id) =>
+        set((state) => {
+          const layer = state.layers.find((l) => l.id === id);
+          if (layer) {
+            saveSnapshot(state);
+            layer.locked = !layer.locked;
+            state.isDirty = true;
+          }
+        }),
+
+      // Icon settings actions
+      setIconShape: (shape) =>
+        set((state) => {
           saveSnapshot(state);
-          layer.locked = !layer.locked;
+          state.iconSettings.shape = shape;
           state.isDirty = true;
-        }
-      }),
+        }),
 
-    // Icon settings actions
-    setIconShape: (shape) =>
-      set((state) => {
-        saveSnapshot(state);
-        state.iconSettings.shape = shape;
-        state.isDirty = true;
-      }),
+      setBackgroundColor: (color) =>
+        set((state) => {
+          saveSnapshot(state);
+          state.iconSettings.backgroundColor = color;
+          state.isDirty = true;
+        }),
 
-    setBackgroundColor: (color) =>
-      set((state) => {
-        saveSnapshot(state);
-        state.iconSettings.backgroundColor = color;
-        state.isDirty = true;
-      }),
+      setNoise: (enabled) =>
+        set((state) => {
+          state.iconSettings.noise = enabled;
+          state.isDirty = true;
+        }),
 
-    setNoise: (enabled) =>
-      set((state) => {
-        state.iconSettings.noise = enabled;
-        state.isDirty = true;
-      }),
+      setNoiseOpacity: (opacity) =>
+        set((state) => {
+          state.iconSettings.noiseOpacity = opacity;
+          state.isDirty = true;
+        }),
 
-    setNoiseOpacity: (opacity) =>
-      set((state) => {
-        state.iconSettings.noiseOpacity = opacity;
-        state.isDirty = true;
-      }),
+      // Canvas actions
+      setZoom: (zoom) =>
+        set((state) => {
+          state.canvas.zoom = Math.max(0.1, Math.min(3, zoom));
+        }),
 
-    // Canvas actions
-    setZoom: (zoom) =>
-      set((state) => {
-        state.canvas.zoom = Math.max(0.1, Math.min(3, zoom));
-      }),
+      setPan: (pan) =>
+        set((state) => {
+          state.canvas.pan = pan;
+        }),
 
-    setPan: (pan) =>
-      set((state) => {
-        state.canvas.pan = pan;
-      }),
+      toggleGrid: () =>
+        set((state) => {
+          state.canvas.showGrid = !state.canvas.showGrid;
+        }),
 
-    toggleGrid: () =>
-      set((state) => {
-        state.canvas.showGrid = !state.canvas.showGrid;
+      resetView: () =>
+        set((state) => {
+          state.canvas.zoom = DEFAULT_CANVAS_STATE.zoom;
+          state.canvas.pan = DEFAULT_CANVAS_STATE.pan;
+        }),
+    })),
+    {
+      name: "icon-craft-editor",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        projectName: state.projectName,
+        layers: state.layers,
+        selectedLayerId: state.selectedLayerId,
+        iconSettings: state.iconSettings,
+        canvas: state.canvas,
+        history: state.history,
+        historyIndex: state.historyIndex,
       }),
-
-    resetView: () =>
-      set((state) => {
-        state.canvas.zoom = DEFAULT_CANVAS_STATE.zoom;
-        state.canvas.pan = DEFAULT_CANVAS_STATE.pan;
-      }),
-  }))
+    }
+  )
 );
 
 // Selectors
