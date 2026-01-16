@@ -1,16 +1,23 @@
-"use client";
+import { Header } from "@/components/home/Header";
+import { HeroSection } from "@/components/home/HeroSection";
+import { FeaturesSection } from "@/components/home/FeaturesSection";
+import { HowItWorksSection } from "@/components/home/HowItWorksSection";
+import { PreviewGallery } from "@/components/home/PreviewGallery";
+import { Footer } from "@/components/home/Footer";
+import { SupporterWall } from "@/components/home/SupporterWall";
 
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/navigation/AppSidebar";
-import { Editor } from "@/components/editor";
-
-export default function Page() {
+export default function LandingPage() {
   return (
-    <SidebarProvider defaultOpen={true}>
-      <AppSidebar />
-      <SidebarInset className="h-svh">
-        <Editor />
-      </SidebarInset>
-    </SidebarProvider>
+    <>
+      <Header />
+      <main>
+        <HeroSection />
+        <FeaturesSection />
+        <HowItWorksSection />
+        <PreviewGallery />
+        <SupporterWall />
+        <Footer />
+      </main>
+    </>
   );
 }

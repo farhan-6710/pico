@@ -16,18 +16,11 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  Home,
-  FolderOpen,
-  Sparkles,
-  Settings,
-  HelpCircle,
-  X,
-} from "lucide-react";
+import { Home, Folder, Sparkles, Settings, HelpCircle, X } from "lucide-react";
 
 const NAV_ITEMS = [
   { icon: Home, label: "Home", href: "/" },
-  { icon: FolderOpen, label: "Projects", href: "/projects" },
+  { icon: Folder, label: "Projects", href: "/projects" },
   { icon: Sparkles, label: "Templates", href: "/templates" },
 ];
 
