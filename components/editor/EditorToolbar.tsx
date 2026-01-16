@@ -49,7 +49,11 @@ const TABS: TabConfig[] = [
 const generateId = () =>
   `layer-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
-export function EditorToolbar() {
+interface EditorToolbarProps {
+  className?: string;
+}
+
+export function EditorToolbar({ className }: EditorToolbarProps) {
   const [activeTab, setActiveTab] = React.useState<TabValue>("edit");
   const layers = useLayers();
   const addLayer = useEditorStore((s) => s.addLayer);
@@ -133,7 +137,7 @@ export function EditorToolbar() {
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className={cn("w-96 shrink-0 border-l border-border bg-card flex h-full flex-col", className)}>
       <input
         ref={fileInputRef}
         type="file"

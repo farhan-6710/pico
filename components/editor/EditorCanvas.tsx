@@ -12,8 +12,13 @@ import { DottedBackground } from "./DottedBackground";
 import { CanvasIconShape } from "./CanvasIconShape";
 import { LayerRenderer } from "./LayerRenderer";
 import CanvasControls from "./CanvasControls";
+import { cn } from "@/lib/utils";
 
-export function EditorCanvas() {
+interface EditorCanvasProps {
+  className?: string;
+}
+
+export function EditorCanvas({ className }: EditorCanvasProps) {
   const iconSettings = useIconSettings();
   const canvas = useCanvasState();
   const { setZoom, resetView, toggleGrid, undo, redo } = useEditorStore();
@@ -57,7 +62,10 @@ export function EditorCanvas() {
 
   return (
     <div
-      className="relative flex-1 flex items-center justify-center bg-canvas overflow-hidden m-2 rounded-lg border border-muted shadow-inner"
+      className={cn(
+        "flex-1 min-w-0 min-h-0 relative flex items-center justify-center bg-canvas overflow-hidden m-2 rounded-lg border border-muted shadow-inner",
+        className
+      )}
       aria-label="Canvas workspace"
     >
       <DottedBackground />
