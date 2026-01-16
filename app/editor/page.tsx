@@ -8,7 +8,7 @@ export default function Page() {
   return (
     <SidebarProvider defaultOpen={true}>
       <AppSidebar />
-      <SidebarInset className="h-svh">
+      <SidebarInset className="bg-background overflow-hidden h-screen flex flex-col">
         <Editor />
       </SidebarInset>
     </SidebarProvider>

@@ -46,7 +46,6 @@ const TABS: TabConfig[] = [
   { value: "export", label: "Export", icon: Download },
 ];
 
-// Helper to generate unique IDs
 const generateId = () =>
   `layer-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -60,8 +59,6 @@ export function EditorToolbar() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const src = e.target?.result as string;
-
-      // Create an image element to get natural dimensions
       const img = new window.Image();
       img.onload = () => {
         const newLayer: ImageLayer = {
@@ -91,7 +88,6 @@ export function EditorToolbar() {
     if (file) {
       handleAddImageLayer(file);
     }
-    // Reset input so the same file can be selected again
     e.target.value = "";
   };
 
@@ -137,11 +133,7 @@ export function EditorToolbar() {
   };
 
   return (
-    <aside
-      className="w-96 border-l border-border bg-card flex flex-col h-full"
-      aria-label="Editor toolbar"
-    >
-      {/* Hidden file input */}
+    <div className="flex h-full flex-col">
       <input
         ref={fileInputRef}
         type="file"
@@ -156,98 +148,53 @@ export function EditorToolbar() {
         orientation="vertical"
         className="flex h-full gap-0"
       >
-        {/* Panel content */}
         <div className="flex-1 overflow-hidden flex flex-col">
-          <TabsContent
-            value="edit"
-            className="flex-1 m-0 flex flex-col overflow-hidden h-full"
-          >
-            <header className="p-4 border-b border-border shrink-0">
-              <h2 className="text-base font-semibold">Edit Layer</h2>
-            </header>
-            <div className="flex-1 overflow-y-auto min-h-0">
-              <EditPanel />
-            </div>
-            <PreviewSection />
-          </TabsContent>
+          {TABS.map((tab) => (
+            <TabsContent
+              key={tab.value}
+              value={tab.value}
+              className="flex-1 m-0 flex flex-col overflow-hidden h-full data-[state=inactive]:hidden"
+            >
+              <header className="p-4 border-b border-border shrink-0 flex items-center justify-between">
+                <h2 className="text-base font-semibold">{tab.label}</h2>
+                {tab.value === "layers" && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-1">
+                        <Plus className="size-3" />
+                        Add Layer
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <ImageIcon className="size-4 mr-2" aria-hidden /> Image
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleAddTextLayer}>
+                        <Type className="size-4 mr-2" /> Text
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleAddShapeLayer}>
+                        <Square className="size-4 mr-2" /> Shape
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </header>
 
-          <TabsContent
-            value="colors"
-            className="flex-1 m-0 flex flex-col overflow-hidden h-full"
-          >
-            <header className="p-4 border-b border-border shrink-0">
-              <h2 className="text-base font-semibold">Edit Colors</h2>
-            </header>
-            <div className="flex-1 overflow-y-auto min-h-0">
-              <ColorsPanel />
-            </div>
-            <PreviewSection />
-          </TabsContent>
+              <div className="flex-1 overflow-y-auto min-h-0">
+                {tab.value === "edit" && <EditPanel />}
+                {tab.value === "colors" && <ColorsPanel />}
+                {tab.value === "surface" && <SurfacePanel />}
+                {tab.value === "layers" && <LayersPanel />}
+                {tab.value === "export" && <ExportPanel />}
+              </div>
 
-          <TabsContent
-            value="surface"
-            className="flex-1 m-0 flex flex-col overflow-hidden h-full"
-          >
-            <header className="p-4 border-b border-border shrink-0">
-              <h2 className="text-base font-semibold">Edit Surface</h2>
-            </header>
-            <div className="flex-1 overflow-y-auto min-h-0">
-              <SurfacePanel />
-            </div>
-            <PreviewSection />
-          </TabsContent>
-
-          <TabsContent
-            value="layers"
-            className="flex-1 m-0 flex flex-col overflow-hidden h-full"
-          >
-            <header className="p-4 border-b border-border shrink-0 flex items-center justify-between">
-              <h2 className="text-base font-semibold">Layers</h2>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-1">
-                    <Plus className="size-3" />
-                    Add Layer
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <ImageIcon className="size-4 mr-2" aria-hidden />
-                    Image
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleAddTextLayer}>
-                    <Type className="size-4 mr-2" />
-                    Text
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleAddShapeLayer}>
-                    <Square className="size-4 mr-2" />
-                    Shape
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </header>
-            <div className="flex-1 overflow-y-auto min-h-0">
-              <LayersPanel />
-            </div>
-            <PreviewSection />
-          </TabsContent>
-
-          <TabsContent
-            value="export"
-            className="flex-1 m-0 flex flex-col overflow-hidden h-full"
-          >
-            <header className="p-4 border-b border-border shrink-0">
-              <h2 className="text-base font-semibold">Export Icon</h2>
-            </header>
-            <div className="flex-1 overflow-y-auto min-h-0">
-              <ExportPanel />
-            </div>
-          </TabsContent>
+              {tab.value !== "export" && <PreviewSection />}
+            </TabsContent>
+          ))}
         </div>
 
-        {/* Vertical tab icons */}
         <div className="flex flex-col items-center py-3 px-1 border-l border-border bg-background">
           <TabsList
             variant="line"
@@ -259,7 +206,7 @@ export function EditorToolbar() {
                 value={tab.value}
                 className={cn(
                   "flex flex-col items-center gap-1 p-2 rounded-lg w-14 h-14",
-                  "data-active:bg-muted data-active:text-foreground"
+                  "data-[state=active]:bg-muted data-[state=active]:text-foreground hover:bg-muted/50 transition-colors"
                 )}
                 aria-label={tab.label}
               >
@@ -270,6 +217,6 @@ export function EditorToolbar() {
           </TabsList>
         </div>
       </Tabs>
-    </aside>
+    </div>
   );
 }
