@@ -33,7 +33,7 @@ export function ColorsPanel() {
   const iconSettings = useIconSettings();
   const setBackgroundColor = useEditorStore((s) => s.setBackgroundColor);
   const [localColor, setLocalColor] = React.useState(
-    iconSettings.backgroundColor
+    iconSettings.backgroundColor,
   );
 
   React.useEffect(() => {
@@ -92,6 +92,7 @@ export function ColorsPanel() {
             onChange={handleInputChange}
             className="font-mono text-xs"
             maxLength={7}
+            aria-label="Hex color code"
           />
         </div>
       </section>
@@ -118,7 +119,7 @@ export function ColorsPanel() {
                   "size-8 rounded-lg border-2 transition-all hover:scale-110",
                   iconSettings.backgroundColor === color
                     ? "border-primary ring-2 ring-primary/30"
-                    : "border-transparent"
+                    : "border-transparent",
                 )}
                 style={{ backgroundColor: color }}
                 aria-label={`Select color ${color}`}

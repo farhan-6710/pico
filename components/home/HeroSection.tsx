@@ -199,7 +199,7 @@ export function HeroSection() {
             <div className="mask-b-from-55% relative mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-16">
               <div className="inset-shadow-2xs dark:inset-shadow-white/20 bg-base-200/20 relative mx-auto max-w-6xl overflow-hidden rounded-3xl border p-2 shadow-lg shadow-zinc-950/15">
                 <Image
-                  className="bg-base-100 aspect-15/8 relative hidden rounded-2xl dark:block border border-base-300 object-cover w-full h-full"
+                  className="bg-base-100 relative hidden rounded-2xl dark:block border border-base-300 w-full h-auto"
                   src="/layouts/dark-layout.png"
                   alt="App interface preview"
                   width="2848"
@@ -207,7 +207,7 @@ export function HeroSection() {
                   priority
                 />
                 <Image
-                  className="z-2 border-base-300/25 aspect-15/8 relative rounded-2xl border dark:hidden object-cover w-full h-full"
+                  className="z-2 border-base-300/25 relative rounded-2xl border dark:hidden w-full h-auto"
                   src="/layouts/white-layout.png"
                   alt="App interface preview"
                   width="2848"

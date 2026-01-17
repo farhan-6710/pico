@@ -165,7 +165,7 @@ export function ExportPanel() {
           Shape Type
         </Label>
         <Select value={iconSettings.shape} onValueChange={handleShapeChange}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full" aria-label="Select shape type">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -196,6 +196,7 @@ export function ExportPanel() {
             variant={format === "png" ? "default" : "outline"}
             className="flex-1 gap-2"
             onClick={() => setFormat("png")}
+            aria-pressed={format === "png"}
           >
             <FileImage className="size-4" />
             PNG
@@ -204,6 +205,7 @@ export function ExportPanel() {
             variant={format === "jpg" ? "default" : "outline"}
             className="flex-1 gap-2"
             onClick={() => setFormat("jpg")}
+            aria-pressed={format === "jpg"}
           >
             <FileImage className="size-4" />
             JPG
@@ -221,7 +223,7 @@ export function ExportPanel() {
           value={preset}
           onValueChange={(value) => setPreset(value as PresetType)}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full" aria-label="Select export preset">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
