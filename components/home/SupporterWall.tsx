@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Leaf, Sparkles, Star, Coffee } from "lucide-react";
 import { SupportCard } from "./SupportCard";
 
@@ -88,9 +89,11 @@ const SupporterAvatar = ({
         className={`relative ${sizeClasses[size]} rounded-full bg-linear-to-br from-card to-secondary border-2 border-border group-hover:border-primary/30 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-105`}
       >
         {supporter.avatar ? (
-          <img
+          <Image
             src={supporter.avatar}
             alt={supporter.name}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="w-full h-full object-cover"
           />
         ) : (
@@ -146,8 +149,8 @@ const TierSection = ({ tier }: { tier: SupporterTier }) => {
                 tier.id === "tree-keepers"
                   ? "lg"
                   : tier.id === "gardeners"
-                  ? "md"
-                  : "sm"
+                    ? "md"
+                    : "sm"
               }
               tier={tier}
             />
@@ -202,7 +205,7 @@ const EmptyState = () => {
 export const SupporterWall = () => {
   // Check if there are any supporters
   const hasAnySupporters = supporterTiers.some(
-    (tier) => tier.supporters.length > 0
+    (tier) => tier.supporters.length > 0,
   );
 
   return (

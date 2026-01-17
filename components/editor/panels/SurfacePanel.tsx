@@ -141,7 +141,7 @@ function PreviewCard({
       <div
         className={cn(
           "size-16 shadow-md flex items-center justify-center text-white text-xs font-semibold",
-          shape === "android-circle" ? "rounded-full" : "rounded-2xl"
+          shape === "android-circle" ? "rounded-full" : "rounded-2xl",
         )}
         style={{ backgroundColor }}
       >

@@ -36,6 +36,8 @@ export function LayerRenderer({
       <img
         src={layer.src}
         alt={layer.name}
+        width={layer.naturalWidth}
+        height={layer.naturalHeight}
         style={style}
         className="max-w-none"
       />

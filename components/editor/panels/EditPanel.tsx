@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
@@ -15,16 +14,7 @@ import {
 import { SliderField } from "@/components/shared/form";
 import { useEditorStore, useSelectedLayer } from "@/lib/stores/editor-store";
 import type { BlendMode } from "@/types";
-import {
-  Move,
-  Maximize2,
-  RotateCw,
-  Eye,
-  Blend,
-  Minus,
-  Plus,
-  Lock,
-} from "lucide-react";
+import { RotateCw, Eye, Blend, Lock, Maximize2 } from "lucide-react";
 
 const BLEND_MODES: { value: BlendMode; label: string }[] = [
   { value: "normal", label: "Normal" },
@@ -198,6 +188,7 @@ export function EditPanel() {
             <Switch
               checked={selectedLayer.visible}
               onCheckedChange={() => toggleLayerVisibility(selectedLayer.id)}
+              aria-label="Toggle layer visibility"
             />
           </div>
           <div className="flex items-center justify-between">
@@ -208,6 +199,7 @@ export function EditPanel() {
             <Switch
               checked={selectedLayer.locked}
               onCheckedChange={() => toggleLayerLock(selectedLayer.id)}
+              aria-label="Toggle layer lock"
             />
           </div>
         </div>
@@ -226,7 +218,7 @@ export function EditPanel() {
         </h3>
         <div className="flex items-center justify-between">
           <Label className="text-xs text-muted-foreground">Shadow</Label>
-          <Switch checked={false} disabled />
+          <Switch checked={false} disabled aria-label="Toggle shadow" />
         </div>
       </section>
     </div>

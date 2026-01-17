@@ -36,7 +36,7 @@ export const Header = () => {
           "mx-auto w-full max-w-6xl rounded-2xl transition-all duration-300",
           isScrolled
             ? "bg-card/80 border border-border shadow-sm backdrop-blur-md px-4 py-3 max-w-4xl"
-            : "px-6 py-4"
+            : "px-6 py-4",
         )}
       >
         <div className="flex items-center justify-between">
@@ -74,7 +74,7 @@ export const Header = () => {
             <Button
               className={cn(
                 "hidden main_button px-4 py-4 text-lg ",
-                isScrolled && "flex"
+                isScrolled && "flex",
               )}
               onClick={() => router.push("/editor")}
             >
@@ -87,7 +87,7 @@ export const Header = () => {
           <button
             className="flex items-center justify-center w-12 h-12 lg:hidden p-2 text-muted-foreground hover:text-foreground focus:outline-none transition-all duration-1000"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
             <Menu
               size={24}
@@ -110,7 +110,7 @@ export const Header = () => {
         <div
           className={cn(
             "lg:hidden overflow-hidden transition-all duration-300 ease-in-out bg-card/80 backdrop-blur-md",
-            isMenuOpen ? "max-h-[400px] opacity-100 mt-4" : "max-h-0 opacity-0"
+            isMenuOpen ? "max-h-[400px] opacity-100 mt-4" : "max-h-0 opacity-0",
           )}
         >
           <div className="flex flex-col gap-4 py-4 border-t border-default-200">

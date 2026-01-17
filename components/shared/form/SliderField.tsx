@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 interface SliderFieldProps {
@@ -58,10 +57,11 @@ export function SliderField({
             onClick={handleDecrement}
             disabled={disabled || value <= min}
             className="h-7 px-2.5 bg-background border border-border rounded-l-md text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            aria-label={`Decrease ${label}`}
           >
             −
           </button>
-          <div className="h-7 min-w-[2.5rem] px-2 bg-background border-y border-border flex items-center justify-center text-xs">
+          <div className="h-7 min-w-10 px-2 bg-background border-y border-border flex items-center justify-center text-xs">
             {value}
             {unit}
           </div>
@@ -70,6 +70,7 @@ export function SliderField({
             onClick={handleIncrement}
             disabled={disabled || value >= max}
             className="h-7 px-2.5 bg-background border border-border rounded-r-md text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            aria-label={`Increase ${label}`}
           >
             +
           </button>

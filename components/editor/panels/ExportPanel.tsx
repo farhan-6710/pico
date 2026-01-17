@@ -61,7 +61,7 @@ export function ExportPanel() {
   const [format, setFormat] = React.useState<ExportFormat>("png");
   const [preset, setPreset] = React.useState<PresetType>("single");
   const [selectedSizes, setSelectedSizes] = React.useState<Set<number>>(
-    new Set([1024])
+    new Set([1024]),
   );
   const [isExporting, setIsExporting] = React.useState(false);
 
@@ -248,8 +248,9 @@ export function ExportPanel() {
                 "flex flex-col items-center justify-center rounded-lg border-2 transition-all p-4",
                 selectedSizes.has(item.size)
                   ? "border-primary bg-primary/10"
-                  : "border-border bg-background hover:bg-muted"
+                  : "border-border bg-background hover:bg-muted",
               )}
+              aria-pressed={selectedSizes.has(item.size)}
             >
               <span className="text-3xl font-bold mb-1">{item.label}</span>
               <span className="text-xs text-muted-foreground">
