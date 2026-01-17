@@ -1,3 +1,11 @@
+/* Rectangle 19 */
+.main_button {
+  background: linear-gradient(-10deg, #60A24B 50%, #74B360 50%);
+  border: 1px solid #3F8C27;
+  box-shadow: inset 1px 1px 0px rgba(220, 255, 210, 0.6);
+  border-radius: 23.5px;
+}
+
 /* =============================================
    Landing Page Animations
    ============================================= */

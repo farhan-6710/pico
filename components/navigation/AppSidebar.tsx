@@ -16,18 +16,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Home, Folder, Sparkles, Settings, HelpCircle, X } from "lucide-react";
-
-const NAV_ITEMS = [
-  { icon: Home, label: "Home", href: "/" },
-  { icon: Folder, label: "Projects", href: "/projects" },
-  { icon: Sparkles, label: "Templates", href: "/templates" },
-];
-
-const FOOTER_ITEMS = [
-  { icon: Settings, label: "Settings", href: "/settings" },
-  { icon: HelpCircle, label: "Help", href: "/help" },
-];
+import { X, Heart, Sparkles } from "lucide-react";
+import { FOOTER_ITEMS, NAV_ITEMS } from "@/constants/navItems";
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar>;
 
@@ -87,19 +77,17 @@ export function AppSidebar({ className, ...props }: AppSidebarProps) {
             <div className="flex size-6 items-center justify-center rounded-full bg-primary/20">
               <Sparkles className="size-3 text-primary" />
             </div>
-            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <span className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
               Support Pico
             </span>
           </div>
-          <p className="text-xs font-medium mb-1">Help Us Grow 🌱</p>
-          <p className="text-[10px] text-muted-foreground mb-2 leading-relaxed">
+          <p className="text-sm font-medium mb-1">Help Us Grow 🌱</p>
+          <p className="text-xs text-muted-foreground mb-2 leading-relaxed">
             Pico is free, no ads, no subscriptions. Your support helps us
             continue growing.
           </p>
-          <Button size="sm" className="w-full gap-2 text-xs">
-            <span className="flex size-4 items-center justify-center rounded bg-background/20 text-[10px] font-bold">
-              N
-            </span>
+          <Button size="lg" className="w-full gap-2 text-md">
+            <Heart className="size-4 fill-rose-500 text-rose-500" />
             Support
           </Button>
         </div>

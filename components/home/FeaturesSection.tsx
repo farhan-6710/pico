@@ -38,7 +38,7 @@ export const FeaturesSection = () => {
   const isDark = mounted && resolvedTheme === "dark";
 
   return (
-    <section className="relative h-fit py-24 px-6 bg-background" id="features">
+    <section className="relative h-fit py-24 px-6 bg-background border" id="features">
       {/* Circuit Board - Light Pattern */}
       <div
         className="absolute inset-0 z-0 pointer-events-none"
@@ -66,7 +66,7 @@ export const FeaturesSection = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-card border border-border overflow-hidden w-full h-full flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 shadow-2xl hover:border-primary hover:scale-102 hover:shadow-primary/20 z-10"
+              className="relative group bg-card border border-border overflow-hidden w-full h-full flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 shadow-2xl hover:border-primary hover:scale-105 hover:shadow-[20px_30px_40px_-15px_color-mix(in_srgb,var(--primary),transparent_70%)] z-10"
             >
               <Image
                 src={isDark ? feature.darkImage : feature.lightImage}

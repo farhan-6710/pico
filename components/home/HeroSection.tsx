@@ -36,7 +36,7 @@ export function HeroSection() {
         className="absolute inset-0 canvas-grid opacity-70"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 1px 1px, var(--base-300) 1px, transparent 0)",
+            "radial-gradient(circle at 1px 1px, var(--muted) 2px, transparent 0)",
           backgroundSize: "20px 20px",
         }}
       />
@@ -50,7 +50,7 @@ export function HeroSection() {
       </div>
 
       <section>
-        <div className="relative pt-24 md:pt-36">
+        <div className="relative pt-24 md:pt-24">
           <AnimatedGroup
             variants={{
               container: {
@@ -90,11 +90,11 @@ export function HeroSection() {
           <div className="mx-auto max-w-7xl px-6">
             <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
               <Badge
-                variant="secondary"
-                className="shadow-md text-lg py-2 px-4 rounded-full inline-flex items-center gap-2"
+                variant="default"
+                className="shadow-md mt-4 lg:mt-8 text-md py-3.5 px-2 rounded-full inline-flex items-center gap-2"
               >
                 <Zap className="size-4" />
-                <div className="w-px h-3 mx-1 bg-muted-foreground rounded-full" />
+                <div className="w-px h-3 mx-1 bg-primary-foreground rounded-full" />
                 Early Beta
               </Badge>
               <div className="flex flex-col gap-0 text-center">
@@ -102,7 +102,7 @@ export function HeroSection() {
                   preset="fade-in-blur"
                   speedSegment={0.3}
                   as="h1"
-                  className="mx-auto mt-8 max-w-4xl text-balance text-5xl font-bold tracking-tight text-foreground md:text-7xl lg:mt-16 xl:text-7xl font-inter leading-tight"
+                  className="mx-auto mt-4 max-w-4xl text-balance text-5xl font-bold tracking-tight text-foreground md:text-7xl lg:mt-8 xl:text-7xl font-inter leading-tight"
                 >
                   Create Beautiful App
                 </TextEffect>

@@ -8,7 +8,7 @@ export function CanvasIconShape({
 }) {
   return (
     <div
-      className="absolute inset-0 z-1 pointer-events-none"
+      className="absolute inset-0 z-10 pointer-events-none"
       style={{
         backgroundImage: `url(/${
           iconSettings.shape === "android-circle"
@@ -18,6 +18,7 @@ export function CanvasIconShape({
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
-    />
+    > 
+    </div>
   );
 }

@@ -109,7 +109,7 @@ export const Header = () => {
         {/* Mobile Menu */}
         <div
           className={cn(
-            "lg:hidden overflow-hidden transition-all duration-300 ease-in-out",
+            "lg:hidden overflow-hidden transition-all duration-300 ease-in-out bg-card/80 backdrop-blur-md",
             isMenuOpen ? "max-h-[400px] opacity-100 mt-4" : "max-h-0 opacity-0"
           )}
         >

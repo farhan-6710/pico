@@ -20,6 +20,17 @@ import type { IconShape } from "@/types";
 import { FileEdit, Square, Circle, FileImage, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { exportIcon } from "@/lib/utils/export";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  endX: number;
+  endY: number;
+  size: number;
+  color: string;
+}
 
 type ExportFormat = "png" | "jpg";
 type PresetType = "single" | "ios-pack" | "android-pack";
@@ -45,6 +56,8 @@ export function ExportPanel() {
   const iconSettings = useIconSettings();
   const layers = useLayers();
   const [fileName, setFileName] = React.useState("icon");
+  const [particles, setParticles] = React.useState<Particle[]>([]);
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
   const [format, setFormat] = React.useState<ExportFormat>("png");
   const [preset, setPreset] = React.useState<PresetType>("single");
   const [selectedSizes, setSelectedSizes] = React.useState<Set<number>>(
@@ -66,11 +79,42 @@ export function ExportPanel() {
     setIconShape(value as IconShape);
   };
 
+  const particleBurst = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const colors = ["#10b981", "#34d399", "#6ee7b7", "#a7f3d0", "#ffffff"];
+      const newParticles = Array.from({ length: 20 }, (_, i) => {
+        const angle = (Math.PI * 2 * i) / 20 + Math.random() * 0.5;
+        const distance = 40 + Math.random() * 60;
+        return {
+          id: Date.now() + i,
+          x: centerX,
+          y: centerY,
+          endX: Math.cos(angle) * distance,
+          endY: Math.sin(angle) * distance,
+          size: 4 + Math.random() * 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+        };
+      });
+
+      setParticles(newParticles);
+
+      // Clear particles after animation
+      setTimeout(() => setParticles([]), 1000);
+    }
+  };
+
   const handleExport = async () => {
     if (selectedSizes.size === 0) {
       alert("Please select at least one size to export");
       return;
     }
+
+    // Trigger particle burst
+    particleBurst();
 
     setIsExporting(true);
     try {
@@ -218,13 +262,38 @@ export function ExportPanel() {
 
       {/* Export Button */}
       <Button
+        ref={buttonRef}
         size="lg"
-        className="w-full gap-2 bg-primary hover:bg-primary/90"
+        className="w-full gap-2 bg-primary hover:bg-primary/90 relative overflow-visible"
         onClick={handleExport}
         disabled={isExporting || selectedSizes.size === 0}
       >
         <Download className="size-4" />
         {isExporting ? "Exporting..." : "Export Image"}
+        <AnimatePresence>
+          {particles.map((particle) => (
+            <motion.span
+              key={particle.id}
+              initial={{ x: particle.x, y: particle.y, opacity: 1, scale: 0 }}
+              animate={{
+                x: particle.x + particle.endX,
+                y: particle.y + particle.endY,
+                opacity: 0,
+                scale: 1,
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="absolute rounded-full pointer-events-none"
+              style={{
+                width: particle.size,
+                height: particle.size,
+                backgroundColor: particle.color,
+                left: 0,
+                top: 0,
+              }}
+            />
+          ))}
+        </AnimatePresence>
       </Button>
     </div>
   );
