@@ -6,7 +6,6 @@ import { Editor } from "@/components/editor";
 import { MobileComingSoon } from "@/components/editor/MobileComingSoon";
 
 export default function Page() {
-  const width = window.innerWidth;
 
   return (
     <>
