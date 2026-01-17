@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "IconCraft - Professional Icon Editor",
+  title: "Pico - Professional Icon Editor",
   description: "Create beautiful app icons with ease",
 };
 

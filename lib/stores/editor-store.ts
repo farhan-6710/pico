@@ -305,7 +305,7 @@ export const useEditorStore = create<EditorState>()(
         }),
     })),
     {
-      name: "icon-craft-editor",
+      name: "pico-editor",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         projectName: state.projectName,

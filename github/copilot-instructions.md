@@ -1,4 +1,4 @@
-# IconCraft Editor - Best Practices Architecture Guide
+# Pico Editor - Best Practices Architecture Guide
 
 ## Project Overview
 
@@ -503,7 +503,7 @@ import { Button } from "@/components/ui/button";
   <header className="p-4 border-b">
     <div className="flex items-center gap-2">
       <Sparkles className="w-6 h-6 text-primary" />
-      <h1 className="text-xl font-bold">IconCraft</h1>
+      <h1 className="text-xl font-bold">Pico</h1>
     </div>
   </header>
 
