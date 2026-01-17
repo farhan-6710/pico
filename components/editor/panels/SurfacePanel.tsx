@@ -40,7 +40,7 @@ export function SurfacePanel() {
             Shape Type
           </Label>
           <Select value={iconSettings.shape} onValueChange={handleShapeChange}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full" aria-label="Select shape type">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
