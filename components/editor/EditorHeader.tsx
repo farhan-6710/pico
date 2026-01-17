@@ -90,6 +90,7 @@ export function EditorHeader() {
               }}
               className="h-6 w-32 text-xs px-1 bg-transparent border-none focus-visible:ring-0"
               autoFocus
+              aria-label="Project name"
             />
           ) : (
             <span

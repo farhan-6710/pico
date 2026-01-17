@@ -199,18 +199,20 @@ export function HeroSection() {
             <div className="mask-b-from-55% relative mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-16">
               <div className="inset-shadow-2xs dark:inset-shadow-white/20 bg-base-200/20 relative mx-auto max-w-6xl overflow-hidden rounded-3xl border p-2 shadow-lg shadow-zinc-950/15">
                 <Image
-                  className="bg-base-100 aspect-15/8 relative hidden rounded-2xl dark:block border border-base-300"
+                  className="bg-base-100 aspect-15/8 relative hidden rounded-2xl dark:block border border-base-300 object-cover w-full h-full"
                   src="/layouts/dark-layout.png"
-                  alt="app screen"
-                  width="2700"
-                  height="1440"
+                  alt="App interface preview"
+                  width="2848"
+                  height="1568"
+                  priority
                 />
                 <Image
-                  className="z-2 border-base-300/25 aspect-15/8 relative rounded-2xl border dark:hidden"
+                  className="z-2 border-base-300/25 aspect-15/8 relative rounded-2xl border dark:hidden object-cover w-full h-full"
                   src="/layouts/white-layout.png"
-                  alt="app screen"
-                  width="2700"
-                  height="1440"
+                  alt="App interface preview"
+                  width="2848"
+                  height="1568"
+                  priority
                 />
               </div>
             </div>

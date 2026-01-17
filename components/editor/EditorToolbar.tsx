@@ -137,13 +137,19 @@ export function EditorToolbar({ className }: EditorToolbarProps) {
   };
 
   return (
-    <div className={cn("w-96 shrink-0 border-l border-border bg-card flex h-full flex-col", className)}>
+    <div
+      className={cn(
+        "w-96 shrink-0 border-l border-border bg-card flex h-full flex-col",
+        className,
+      )}
+    >
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
         className="hidden"
         onChange={handleFileSelect}
+        aria-label="Upload image"
       />
 
       <Tabs
@@ -210,7 +216,7 @@ export function EditorToolbar({ className }: EditorToolbarProps) {
                 value={tab.value}
                 className={cn(
                   "flex flex-col items-center gap-1 p-2 rounded-lg w-14 h-14",
-                  "data-[state=active]:bg-muted data-[state=active]:text-foreground hover:bg-muted/50 transition-colors"
+                  "data-[state=active]:bg-muted data-[state=active]:text-foreground hover:bg-muted/50 transition-colors",
                 )}
                 aria-label={tab.label}
               >

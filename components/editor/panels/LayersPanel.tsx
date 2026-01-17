@@ -94,7 +94,7 @@ function LayerListItem({
           "group flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors",
           isSelected
             ? "bg-primary/10 border border-primary/30"
-            : "hover:bg-muted/50 border border-transparent"
+            : "hover:bg-muted/50 border border-transparent",
         )}
         onClick={() => selectLayer(layer.id)}
         role="button"
@@ -304,6 +304,7 @@ export function LayersPanel() {
         accept="image/*"
         className="hidden"
         onChange={handleFileSelect}
+        aria-label="Upload layer image"
       />
 
       {/* Layers list */}
