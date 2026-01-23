@@ -13,16 +13,13 @@ Built with **Next.js 16** and **React 19**, Pico leverages cutting-edge web tech
 ### 🎯 Core Editing Experience
 
 - **Layer-Based Canvas System**  
-  Independent layers with full support for SVGs, images, shapes (iOS squircle, Android rounded square), and text elements. Each layer maintains its own transform state (position, rotation, scale), appearance properties (opacity, blend mode, blur), and styling (fill, stroke, shadows).
+  Independent layers with full support for SVGs, images, shapes (iOS squircle, Android rounded square), and text elements. Each layer maintains its own transform state, appearance properties, and styling.
 
 - **Photoshop-Like Interface**  
-  Professional canvas editor with fixed 1024×1024px workspace, intuitive panning controls (middle-click or space+drag), smooth zoom (50%-200%), and drag-drop layer reordering with context menus.
+  Professional canvas editor with fixed 1024×1024px workspace, intuitive panning controls (middle-click or space+drag), smooth zoom (50%-200%), and drag-drop layer reordering.
 
-- **Advanced Layer Effects**
-  - **16 Blend Modes**: normal, multiply, screen, overlay, darken, lighten, color-dodge, color-burn, hard-light, soft-light, difference, exclusion, hue, saturation, color, luminosity
-  - **Shadows**: outer shadow, inner shadow, ambient shadow, and glow with full RGBA color control
-  - **Strokes**: configurable width, color, and alignment (center, inside, outside)
-  - **Gradients**: linear and radial gradients with multi-stop color control
+- **Advanced Layer Effects**  
+  16 blend modes, configurable shadows (outer, inner, ambient, glow), strokes with alignment options, and linear/radial gradients with multi-stop color control.
 
 - **Real-Time Preview**  
   Live icon preview panel with instant updates as layers are modified. No lag, no delay—see changes immediately.
@@ -32,13 +29,13 @@ Built with **Next.js 16** and **React 19**, Pico leverages cutting-edge web tech
 ### 🎨 Smart Design Tools
 
 - **Shape Presets**  
-  iOS squircle (custom SVG clip path) and Android rounded square presets with automatic background masking.
+  iOS squircle and Android rounded square presets with automatic background masking.
 
 - **Dynamic Color Management**  
   HexColorPicker integration for precise color selection. Support for solid fills and gradients on individual layers and icon background.
 
 - **Noise Texture System**  
-  Procedural noise overlay with adjustable intensity (0-100), opacity (0-100), size (0-500px), and 16 blend modes for authentic textured effects.
+  Procedural noise overlay with adjustable intensity, opacity, size, and 16 blend modes for authentic textured effects.
 
 - **SVG Processing**  
   Intelligent SVG parsing and optimization with dynamic fill color override. Upload any SVG and recolor it instantly without losing quality.
@@ -64,10 +61,10 @@ Built with **Next.js 16** and **React 19**, Pico leverages cutting-edge web tech
   Optimized React component hierarchy with memoization, efficient Zustand selectors, and minimal re-renders. Handles complex multi-layer compositions smoothly.
 
 - **Multi-Format Export**  
-  Export to PNG and JPG with custom dimensions and quality settings. Support for batch exports including iOS (12 sizes from 20×20 to 1024×1024) and Android (6 sizes from 48×48 to 512×512) presets with automatic file naming.
+  Export to PNG and JPG with custom dimensions and quality settings. Support for batch exports including iOS (12 sizes) and Android (6 sizes) presets with automatic file naming.
 
 - **Platform-Specific Optimization**  
-  Export presets tailored for iOS App Store, Android Play Store, and all device densities (mdpi, hdpi, xhdpi, xxhdpi, xxxhdpi) with proper suffixes.
+  Export presets tailored for iOS App Store, Android Play Store, and all device densities with proper suffixes.
 
 ---
 
@@ -78,7 +75,7 @@ Built with **Next.js 16** and **React 19**, Pico leverages cutting-edge web tech
 - **Framework:** Next.js 16 (App Router)
 - **Language:** TypeScript (strict mode)
 - **UI Library:** shadcn/ui (Radix UI primitives)
-- **Styling:** Tailwind CSS 4 + class-variance-authority
+- **Styling:** Tailwind CSS 4
 - **Icons:** Lucide React / @iconify/react
 - **Animations:** Framer Motion 11
 
@@ -95,7 +92,6 @@ Built with **Next.js 16** and **React 19**, Pico leverages cutting-edge web tech
 - **Batch Export:** JSZip (multi-file ZIP generation)
 - **File Saving:** file-saver
 - **SVG Processing:** svgo (optimization)
-- **Unique IDs:** uuid v13
 
 ### Theme & Accessibility
 
@@ -108,21 +104,14 @@ Built with **Next.js 16** and **React 19**, Pico leverages cutting-edge web tech
 
 ### Layer Independence
 
-Each layer is a fully independent entity with:
-
-- **Transform**: x/y position, scale (10-300%), rotation (0-360°)
-- **Visibility**: show/hide toggle, lock editing
-- **Appearance**: opacity (0-100%), blend mode, blur
-- **Effects**: shadow, inner shadow
-- **Stroke**: width, color, alignment
-- **Fill**: solid color or gradient (linear/radial)
+Each layer is a fully independent entity with transform (position, scale, rotation), visibility controls, appearance settings (opacity, blend mode, blur), effects (shadows, strokes), and fill options (solid color or gradient).
 
 Layers render as absolutely positioned elements with CSS transforms. SVG layers support dynamic fill color override without modifying source files.
 
 ### Zustand Store Pattern
 
 ```typescript
-// ✅ Efficient selector pattern
+// Efficient selector pattern
 const selectedLayer = useEditorStore((state) => state.selectedLayer);
 const updateLayer = useEditorStore((state) => state.updateLayer);
 
@@ -136,17 +125,11 @@ updateLayer(layerId, {
 });
 ```
 
-Single source of truth with automatic persistence. All state changes debounced to localStorage. Zustand store provides optimized selectors for minimal re-renders.
+Single source of truth with automatic persistence. All state changes debounced to localStorage.
 
 ### Icon-Level Effects
 
-Global icon effects applied to the entire composition:
-
-- **Background**: solid color or gradient with iOS/Android shape masking
-- **Shadows**: outer shadow, inner shadow, ambient shadow, glow
-- **Texture**: procedural noise with configurable blend mode
-
-Fixed 1024×1024px canvas ensures stable rendering without dynamic resizing complexity.
+Global icon effects applied to the entire composition including background (solid color or gradient with iOS/Android shape masking), shadows, and procedural noise texture. Fixed 1024×1024px canvas ensures stable rendering.
 
 ---
 
@@ -158,14 +141,13 @@ Fixed 1024×1024px canvas ensures stable rendering without dynamic resizing comp
 │   ├── help/                 # Help and documentation
 │   └── settings/             # Application settings
 ├── components/               # React components
-│   ├── editor/               # Core editor components (canvas, toolbar, layers)
+│   ├── editor/               # Core editor components
 │   │   └── panels/           # Toolbar panels (edit, colors, export, surface)
-│   ├── home/                 # Landing page sections (hero, features, gallery)
+│   ├── home/                 # Landing page sections
 │   ├── modals/               # Modal dialogs and overlays
-│   ├── motion-primitives/    # Animation and motion components
-│   ├── navigation/           # Navigation and sidebar components
+│   ├── motion-primitives/    # Animation components
+│   ├── navigation/           # Navigation components
 │   ├── shared/               # Reusable shared components
-│   │   └── form/             # Form field components
 │   └── ui/                   # Base UI primitives (shadcn/ui)
 ├── lib/
 │   ├── constants/            # Application constants
@@ -174,105 +156,8 @@ Fixed 1024×1024px canvas ensures stable rendering without dynamic resizing comp
 ├── types/                    # TypeScript type definitions
 ├── hooks/                    # Custom React hooks
 ├── providers/                # React context providers
-├── constants/                # Static configuration
-├── styles/                   # Global CSS and styling
-└── public/                   # Static assets (icons, images, layouts)
+└── public/                   # Static assets
 ```
-
----
-
-## 🧭 User Interface Structure
-
-### Editor Layout
-
-- **Canvas Area** (left)
-  - Visual icon composer with panning and zoom
-  - Layer selection and manipulation
-  - Background grid with toggle
-  - Undo/Redo controls
-
-- **Toolbar** (right, tabbed)
-  - **Layers Panel**: file upload, shape/text creation, layer list
-  - **Edit Panel**: transform, effects, shadows, strokes
-  - **Colors Panel**: color picker for fills and gradients
-  - **Surface Panel**: icon background, shape presets, noise texture
-
-- **Preview Panel** (bottom right)
-  - Live 256×256px preview
-  - Real-time updates
-
-### Export Interface
-
-- Export panel with batch tools
-- iOS/Android preset generators
-- Custom dimension and quality controls
-- ZIP download for multi-file exports
-
----
-
-## 🎨 Layer System
-
-### Layer Types
-
-1. **SVG Layers**  
-   Vector graphics with dynamic fill color override. Upload any SVG and recolor it on the fly.
-
-2. **Image Layers**  
-   Raster images (PNG, JPG, WebP) with full transform and effects support.
-
-3. **Shape Layers**  
-   iOS squircle or Android rounded square shapes with configurable border radius.
-
-4. **Text Layers**  
-   Typography support with font family, weight, size, letter spacing, and line height controls.
-
-### Layer Properties
-
-- **Transform**: position (x, y), scale (10-300%), rotation (0-360°)
-- **Visibility**: visible toggle, locked editing
-- **Appearance**: opacity (0-100%), blend mode (16 modes), blur
-- **Style**: fill color/gradient, stroke (width, color, alignment), shadow, inner shadow
-- **Shape-specific**: border radius
-- **Image-specific**: mask inside icon shape
-- **Text-specific**: font properties
-
----
-
-## 🔐 State Persistence
-
-### LocalStorage Strategy
-
-- **Automatic Saves**: State automatically persisted to `icon-store` key
-- **Debounced Writes**: 800ms debounce to prevent performance issues
-- **Version Control**: Store version 2 with migration support
-- **Data Integrity**: Full state serialization with layers, effects, and settings
-
-### Redux DevTools Integration
-
-Install Redux DevTools browser extension for:
-
-- Time-travel debugging
-- State inspection
-- Action history
-- Performance profiling
-
----
-
-## ⚡ Performance Optimizations
-
-### React Optimizations
-
-- **Memoized Components**: Canvas controls, buttons, and layer renderers
-- **Efficient Selectors**: Zustand selectors prevent unnecessary re-renders
-- **Callback Stability**: Stable action references from store
-- **Conditional Rendering**: Only render visible layers and active panels
-
-### Rendering Strategy
-
-- **Fixed Canvas Size**: 1024×1024px eliminates resize calculations
-- **CSS Transforms**: Hardware-accelerated layer positioning
-- **Blend Modes**: Native CSS `mix-blend-mode` for effects
-- **Debounced Updates**: LocalStorage writes batched to reduce I/O
 
 ---
 
@@ -297,7 +182,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser. Development server runs on network (accessible at local IP).
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Build & Deploy
 
@@ -314,21 +199,7 @@ npm run lint
 
 ---
 
-## 🎯 Project Focus
-
-Pico is designed as a **frontend-specialized full-stack application**, emphasizing:
-
-- **Professional UI/UX**: Photoshop-inspired interface with intuitive controls
-- **Performance**: Optimized rendering and state management for smooth 60fps interactions
-- **Type Safety**: Strict TypeScript with comprehensive type definitions
-- **Scalable Architecture**: Clean separation of concerns with Zustand store pattern
-- **Production-Ready**: Deployed with Vercel Analytics, error reporting, and performance monitoring
-
-The project demonstrates expertise in modern React patterns, advanced state management, real-world canvas manipulation, and production-grade frontend engineering practices.
-
----
-
-## 📋 Keyboard Shortcuts
+## ⌨️ Keyboard Shortcuts
 
 - **Space + Drag**: Pan canvas
 - **Middle-Click + Drag**: Pan canvas
@@ -352,23 +223,23 @@ import { Layer } from "@/types";
 
 ### Adding Layer Properties
 
-1. Extend `Layer` interface in `types/layer.types.ts` or `types/index.ts`
+1. Extend `Layer` interface in `types/`
 2. Initialize in `addLayer()` action in `lib/stores/editor-store.ts`
-3. Add UI control in appropriate panel (under `components/editor/panels/`)
+3. Add UI control in appropriate panel under `components/editor/panels/`
 4. Call `updateLayer(id, { propertyName: value })`
 
 ### Adding Icon Properties
 
-1. Extend `IconProps` interface in `types/canvas.types.ts` or `types/index.ts`
+1. Extend `IconProps` interface in `types/`
 2. Initialize in `defaultIconProps` in `lib/stores/editor-store.ts`
-3. Add UI control in `components/editor/panels/SurfacePanel.tsx` or `EditPanel.tsx`
+3. Add UI control in `SurfacePanel.tsx` or `EditPanel.tsx`
 4. Call `updateIconProps({ propertyName: value })`
 
 ---
 
-## 📚 Additional Documentation
+## 🎯 Project Focus
 
-- [github/copilot-instructions.md](github/copilot-instructions.md) – Complete architecture reference and coding guidelines
+Pico is designed as a **frontend-specialized full-stack application**, emphasizing professional UI/UX, performance optimization, type safety, and scalable architecture. The project demonstrates expertise in modern React patterns, advanced state management, real-world canvas manipulation, and production-grade frontend engineering practices.
 
 ---
 
