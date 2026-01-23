@@ -4,7 +4,7 @@
 
 Pico is a **high-performance, Photoshop-inspired icon editor** built for modern designers and developers. Featuring a sophisticated layer-based canvas system with independent transforms, blend modes, and advanced effects, Pico enables pixel-perfect icon composition with a focus on usability, performance, and professional-grade output.
 
-Built with **Next.js 16** and **React 19**, Pico leverages cutting-edge web technologies including **Zustand** for predictable state management, **HeroUI v3** for polished UI components, and **html-to-image** for high-quality exports across multiple formats and sizes.
+Built with **Next.js 16** and **React 19**, Pico leverages cutting-edge web technologies including **Zustand** for predictable state management, **shadcn/ui** for accessible UI components, and **html-to-image** for high-quality exports across multiple formats and sizes.
 
 ---
 
@@ -77,9 +77,9 @@ Built with **Next.js 16** and **React 19**, Pico leverages cutting-edge web tech
 
 - **Framework:** Next.js 16 (App Router)
 - **Language:** TypeScript (strict mode)
-- **UI Library:** HeroUI v3.0.0-beta (React Aria components)
-- **Styling:** Tailwind CSS 4 + tailwind-variants
-- **Icons:** @iconify/react
+- **UI Library:** shadcn/ui (Radix UI primitives)
+- **Styling:** Tailwind CSS 4 + class-variance-authority
+- **Icons:** Lucide React / @iconify/react
 - **Animations:** Framer Motion 11
 
 ### State Management & Data Flow
@@ -100,7 +100,7 @@ Built with **Next.js 16** and **React 19**, Pico leverages cutting-edge web tech
 ### Theme & Accessibility
 
 - **Theme Management:** next-themes (light/dark mode)
-- **Accessibility:** Built-in React Aria support via HeroUI
+- **Accessibility:** Built-in accessibility via Radix UI primitives
 
 ---
 
@@ -123,8 +123,8 @@ Layers render as absolutely positioned elements with CSS transforms. SVG layers 
 
 ```typescript
 // ✅ Efficient selector pattern
-const selectedLayer = useIconEditorStore((state) => state.selectedLayer);
-const updateLayer = useIconEditorStore((state) => state.updateLayer);
+const selectedLayer = useEditorStore((state) => state.selectedLayer);
+const updateLayer = useEditorStore((state) => state.updateLayer);
 
 // Update layer properties
 updateLayer(layerId, {
@@ -136,7 +136,7 @@ updateLayer(layerId, {
 });
 ```
 
-Single source of truth with automatic persistence. All state changes debounced to localStorage. Pre-built selectors (`useSelectedLayer`, `useIconProps`, `useZoom`, `usePanOffset`) for optimal performance.
+Single source of truth with automatic persistence. All state changes debounced to localStorage. Zustand store provides optimized selectors for minimal re-renders.
 
 ### Icon-Level Effects
 
@@ -203,7 +203,7 @@ Fixed 1024×1024px canvas ensures stable rendering without dynamic resizing comp
 
 ### Export Interface
 
-- Dedicated export page with batch tools
+- Export panel with batch tools
 - iOS/Android preset generators
 - Custom dimension and quality controls
 - ZIP download for multi-file exports
@@ -346,30 +346,29 @@ The project demonstrates expertise in modern React patterns, advanced state mana
 `@/*` maps to root directory:
 
 ```typescript
-import { useIconEditorStore } from "@/store/useIconEditorStore";
+import { useEditorStore } from "@/lib/stores/editor-store";
 import { Layer } from "@/types";
 ```
 
 ### Adding Layer Properties
 
-1. Extend `Layer` interface in `types/index.ts`
-2. Initialize in `addLayer()` action in `useIconEditorStore.ts`
-3. Add UI control in appropriate panel
+1. Extend `Layer` interface in `types/layer.types.ts` or `types/index.ts`
+2. Initialize in `addLayer()` action in `lib/stores/editor-store.ts`
+3. Add UI control in appropriate panel (under `components/editor/panels/`)
 4. Call `updateLayer(id, { propertyName: value })`
 
 ### Adding Icon Properties
 
-1. Extend `IconProps` interface in `types/index.ts`
-2. Initialize in `defaultIconProps` in `useIconEditorStore.ts`
-3. Add UI control in `SurfacePanel` or `EditPanel`
+1. Extend `IconProps` interface in `types/canvas.types.ts` or `types/index.ts`
+2. Initialize in `defaultIconProps` in `lib/stores/editor-store.ts`
+3. Add UI control in `components/editor/panels/SurfacePanel.tsx` or `EditPanel.tsx`
 4. Call `updateIconProps({ propertyName: value })`
 
 ---
 
 ## 📚 Additional Documentation
 
-- [ZUSTAND_GUIDE.md](ZUSTAND_GUIDE.md) – Comprehensive store usage guide
-- [.github/copilot-instructions.md](.github/copilot-instructions.md) – Complete architecture reference
+- [github/copilot-instructions.md](github/copilot-instructions.md) – Complete architecture reference and coding guidelines
 
 ---
 
@@ -379,4 +378,4 @@ MIT License – See LICENSE file for details
 
 ---
 
-Built with ❤️ using Next.js, React 19, Zustand, and HeroUI
+Built with ❤️ using Next.js, React 19, Zustand, and shadcn/ui
