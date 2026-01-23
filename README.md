@@ -19,10 +19,10 @@ Built with **Next.js 16** and **React 19**, Pico leverages cutting-edge web tech
   Professional canvas editor with fixed 1024×1024px workspace, intuitive panning controls (middle-click or space+drag), smooth zoom (50%-200%), and drag-drop layer reordering with context menus.
 
 - **Advanced Layer Effects**
-    - **16 Blend Modes**: normal, multiply, screen, overlay, darken, lighten, color-dodge, color-burn, hard-light, soft-light, difference, exclusion, hue, saturation, color, luminosity
-    - **Shadows**: outer shadow, inner shadow, ambient shadow, and glow with full RGBA color control
-    - **Strokes**: configurable width, color, and alignment (center, inside, outside)
-    - **Gradients**: linear and radial gradients with multi-stop color control
+  - **16 Blend Modes**: normal, multiply, screen, overlay, darken, lighten, color-dodge, color-burn, hard-light, soft-light, difference, exclusion, hue, saturation, color, luminosity
+  - **Shadows**: outer shadow, inner shadow, ambient shadow, and glow with full RGBA color control
+  - **Strokes**: configurable width, color, and alignment (center, inside, outside)
+  - **Gradients**: linear and radial gradients with multi-stop color control
 
 - **Real-Time Preview**  
   Live icon preview panel with instant updates as layers are modified. No lag, no delay—see changes immediately.
@@ -128,11 +128,11 @@ const updateLayer = useIconEditorStore((state) => state.updateLayer);
 
 // Update layer properties
 updateLayer(layerId, {
-    x: 100,
-    y: 50,
-    scale: 150,
-    opacity: 80,
-    blendMode: "multiply",
+  x: 100,
+  y: 50,
+  scale: 150,
+  opacity: 80,
+  blendMode: "multiply",
 });
 ```
 
@@ -153,59 +153,30 @@ Fixed 1024×1024px canvas ensures stable rendering without dynamic resizing comp
 ## 📂 Project Structure
 
 ```
-├── app/                    # Next.js App Router
-│   ├── (editor)/           # Editor route group
-│   │   ├── editor/         # Main editor page
-│   │   │   └── page.tsx
-│   │   ├── export/         # Export page with batch tools
-│   │   │   └── page.tsx
-│   │   ├── layout.tsx
-│   │   └── loading.tsx
-│   ├── landing/            # Landing page
-│   │   ├── components/     # Hero, Features, Gallery, etc.
-│   │   └── layout.tsx
-│   ├── report/             # Bug report page
-│   ├── api/                # API routes
-│   ├── layout.tsx          # Root layout (theme provider)
-│   ├── page.tsx            # Landing redirect
-│   └── globals.css         # Global styles
-├── components/             # Core editor components
-│   ├── Editor.tsx          # Root editor (state distribution)
-│   ├── Canvas.tsx          # Canvas editor (panning, selection)
-│   ├── CanvasIconBackground.tsx   # Background renderer
-│   ├── CanvasLayerRenderer.tsx    # Layer renderer (shared logic)
-│   ├── CanvasLayerSidebar.tsx     # Layer list (drag-drop)
-│   ├── CanvasZoomControls.tsx     # Zoom UI
-│   ├── IOSSquircleMask.tsx        # iOS squircle SVG clip
-│   ├── PreviewPanel.tsx           # Live preview
-│   ├── toolbar.tsx                # Tabbed toolbar
-│   ├── panels/                    # Toolbar panels
-│   │   ├── EditPanel.tsx          # Layer properties editor
-│   │   ├── ColorsPanel.tsx        # Color picker
-│   │   └── SurfacePanel.tsx       # Icon background/effects
-│   ├── motion-primitives/         # Animation components
-│   └── theme-provider.tsx         # Theme wrapper
-├── store/
-│   └── useIconEditorStore.ts      # Zustand store (single source)
-├── hooks/
-│   ├── usePanning.ts              # Canvas panning logic
-│   └── useNavbarShortcuts.ts      # Keyboard shortcuts
-├── types/
-│   └── index.ts                   # TypeScript interfaces
-├── utils/
-│   ├── export.ts                  # Export logic (iOS/Android)
-│   ├── layer.ts                   # Layer utilities
-│   ├── localStorage.ts            # Storage helpers
-│   └── svgProcessor.ts            # SVG parsing
+├── app/                      # Next.js App Router pages
+│   ├── editor/               # Main icon editor interface
+│   ├── help/                 # Help and documentation
+│   └── settings/             # Application settings
+├── components/               # React components
+│   ├── editor/               # Core editor components (canvas, toolbar, layers)
+│   │   └── panels/           # Toolbar panels (edit, colors, export, surface)
+│   ├── home/                 # Landing page sections (hero, features, gallery)
+│   ├── modals/               # Modal dialogs and overlays
+│   ├── motion-primitives/    # Animation and motion components
+│   ├── navigation/           # Navigation and sidebar components
+│   ├── shared/               # Reusable shared components
+│   │   └── form/             # Form field components
+│   └── ui/                   # Base UI primitives (shadcn/ui)
 ├── lib/
-│   ├── constants.ts               # App constants
-│   └── utils.ts                   # General utilities
-├── data/
-│   └── colorPalettes.json         # Color presets
-└── public/                        # Static assets
-    ├── icons/                     # Sample icons
-    ├── layouts/                   # Layout screenshots
-    └── pico-screenshot.png        # Banner image
+│   ├── constants/            # Application constants
+│   ├── stores/               # Zustand state management
+│   └── utils/                # Utility functions (export, layer helpers)
+├── types/                    # TypeScript type definitions
+├── hooks/                    # Custom React hooks
+├── providers/                # React context providers
+├── constants/                # Static configuration
+├── styles/                   # Global CSS and styling
+└── public/                   # Static assets (icons, images, layouts)
 ```
 
 ---
@@ -215,20 +186,20 @@ Fixed 1024×1024px canvas ensures stable rendering without dynamic resizing comp
 ### Editor Layout
 
 - **Canvas Area** (left)
-    - Visual icon composer with panning and zoom
-    - Layer selection and manipulation
-    - Background grid with toggle
-    - Undo/Redo controls
+  - Visual icon composer with panning and zoom
+  - Layer selection and manipulation
+  - Background grid with toggle
+  - Undo/Redo controls
 
 - **Toolbar** (right, tabbed)
-    - **Layers Panel**: file upload, shape/text creation, layer list
-    - **Edit Panel**: transform, effects, shadows, strokes
-    - **Colors Panel**: color picker for fills and gradients
-    - **Surface Panel**: icon background, shape presets, noise texture
+  - **Layers Panel**: file upload, shape/text creation, layer list
+  - **Edit Panel**: transform, effects, shadows, strokes
+  - **Colors Panel**: color picker for fills and gradients
+  - **Surface Panel**: icon background, shape presets, noise texture
 
 - **Preview Panel** (bottom right)
-    - Live 256×256px preview
-    - Real-time updates
+  - Live 256×256px preview
+  - Real-time updates
 
 ### Export Interface
 
