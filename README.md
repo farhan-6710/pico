@@ -1,20 +1,18 @@
+![Pico Banner](./public/app-screenshot.png)
+
 # Pico
 
 Browser-based app icon editor. Compose layers on a canvas, preview iOS squircle and Android circle shapes, and export PNG or JPG at one or many sizes. Early beta; no signup. The editor is desktop-only.
 
+This repo is a single Next.js app. There is no `server/` package and no database.
+
+| Package | Role | Dev URL |
+| --- | --- | --- |
+| `.` | Next.js App Router UI | `http://localhost:3000` |
+
 ## Stack
 
-| Layer | Actual |
-| --- | --- |
-| App | Next.js 16 (App Router), React 19, TypeScript (strict) |
-| UI | shadcn/ui (radix-nova), Tailwind CSS 4, CSS variables |
-| Icons | `lucide-react` in app code; Hugeicons inside shadcn primitives |
-| Motion | Framer Motion |
-| Color | `react-colorful` |
-| State | Zustand 5 (`immer` + `persist` → `localStorage` key `pico-editor`) |
-| Export | Canvas 2D, JSZip, `file-saver` |
-| Theme | `next-themes` (class, default dark, system enabled) |
-| Package manager | Bun (`bun.lock`) |
+**Client:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui (radix-nova), Framer Motion, `react-colorful`, Zustand 5 (`immer` + persist → `localStorage` key `pico-editor`), Canvas 2D / JSZip / `file-saver`, `next-themes`. Icons: `lucide-react` in app code; Hugeicons inside shadcn primitives. Package manager: Bun (`bun.lock`).
 
 No backend, API routes, or env vars. Persistence is browser `localStorage` only.
 
@@ -44,37 +42,32 @@ public/                 Static images
 
 Alias: `@/*` → repo root.
 
-## Architecture
-
 ```
-/            Header + landing sections + Footer
-/editor      SidebarProvider → AppSidebar + Editor
-             Editor → EditorHeader | EditorCanvas | EditorToolbar
-             Toolbar tabs: Edit, Colors, Surface, Layers, Export
-/help        Placeholder
-/settings    Placeholder
+UI → useEditorStore → localStorage ("pico-editor")
+Export runs in the browser (`lib/utils/export.ts`)
 ```
 
-UI reads and writes `useEditorStore`. Export runs in the browser (`lib/utils/export.ts`).
+**Routes (client):** `/` landing, `/editor` canvas + toolbar, `/help` placeholder, `/settings` placeholder.
 
 ## Setup
 
 Requires Bun (or npm). No `.env` file.
 
-```bash
+```sh
 bun install
 bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Editor: `/editor`.
+Open `http://localhost:3000`. Editor: `/editor`.
 
-| Script | Command |
-| --- | --- |
-| Dev | `bun run dev` |
-| Production build | `bun run build` |
-| Serve build | `bun run start` |
-| Lint | `bun run lint` |
+## Scripts
 
-`.env*` is gitignored. The app does not read environment variables.
+**Client:** `dev`, `build`, `start`, `lint`.
 
 Typecheck (no npm script): `bunx tsc --noEmit`.
+
+## Deploy
+
+| Piece | Platform | URL | Account |
+| --- | --- | --- | --- |
+| Client | Vercel | https://pico-teal.vercel.app/ | main — `itz.me.**********@gmail.com` |
